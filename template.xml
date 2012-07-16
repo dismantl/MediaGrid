@@ -1,0 +1,76 @@
+<html xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1">
+<head><title>Media Grid</title>
+<link href="/css/mediagrid.css" type="text/css" rel="stylesheet" />
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+</head>
+<body class="tahoe-directory-page">
+
+<h1><a href="/" style="color:black">MediaGrid</a></h1>
+
+<a class="breadcrumb" t:render="breadcrumb"><t:attr name="href"><t:slot name="backurl" /></t:attr><t:slot name="backtext" /> »</a><t:transparent t:render="current" />
+
+<div>
+  <table class="tahoe-directory"><tr id="headers">
+      <th>Type</th>
+      <th>Filename</th>
+      <th>Size (bytes)</th>
+      <th>Time Uploaded</th>
+    </tr><tr t:render="file" class="node">
+      <td><t:slot name="type" /></td>
+      <td><a><t:attr name="href"><t:slot name="fileurl" /></t:attr><t:slot name="filename" /></a></td>
+      <td><t:slot name="size" /></td>
+      <td class="time"><t:slot name="time"/></td>
+      <td class="epoch" style="display:none"><t:slot name="epoch"/></td>
+    </tr></table>
+</div>
+
+<div class="tahoe-directory-footer" t:render="form">
+<form method="POST" enctype="multipart/form-data"><t:attr name="action"><t:slot name="posturl" /></t:attr>
+<!--<form method="post" enctype="multipart/form-data" action=".">-->
+ <fieldset>
+  <input type="hidden" name="t" value="mkdir" />
+  <input type="hidden" name="when_done"><t:attr name="value"><t:slot name="whendone" /></t:attr></input>
+  <legend class="freeform-form-label">Create a new directory in this directory</legend>
+  New directory name: 
+  <input type="text" name="name" />
+  <input type="submit" value="Create" />
+ </fieldset>
+</form>
+<form method="POST" enctype="multipart/form-data"><t:attr name="action"><t:slot name="posturl" /></t:attr>
+<!--<form method="POST" enctype="multipart/form-data" action="/?dir=">-->
+ <fieldset>
+  Upload a file to this directory:
+  <input type="hidden" name="t" value="upload" />
+  <input type="hidden" name="replace" value="false" />
+  <input type="hidden" name="when_done"><t:attr name="value"><t:slot name="whendone" /></t:attr></input>
+  <input type="file" id="file" name="file" />
+  <input type="submit" id="submit" value="Upload" />
+ </fieldset>
+</form>
+
+<fieldset id="logos">
+  <h3>Powered by:</h3>
+  <a href="https://tahoe-lafs.org/" target="_blank"><img src="/tahoe_small.png" /></a>
+  <a href="http://www.olsr.org/" target="_blank"><img src="/olsr_small.jpg" /></a>
+</fieldset>
+
+</div>
+
+
+
+<!--<form method="POST" enctype="multipart/form-data" action=".">
+  <input type="text" name="the-field" />
+  <input type="submit" value="Send" />
+</form>-->
+
+<!--<script type="text/javascript">
+document.getElementById('submit').onclick = function(){
+	var filename = document.getElementById('file').value;
+	document.getElementById('filename').setAttribute('value',filename);
+}
+</script>-->
+
+<script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/js/poll.js"></script>
+
+</body></html>

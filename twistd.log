@@ -1,0 +1,145 @@
+2012-07-05 16:09:42-0400 [-] Log opened.
+2012-07-05 16:09:42-0400 [-] twistd 11.1.0 (/usr/bin/python 2.7.2) starting up.
+2012-07-05 16:09:42-0400 [-] reactor class: twisted.internet.pollreactor.PollReactor.
+2012-07-05 16:09:42-0400 [-] Site starting on 8080
+2012-07-05 16:09:42-0400 [-] Starting factory <twisted.web.server.Site instance at 0x7fabcd98c758>
+2012-07-05 16:09:44-0400 [HTTPChannel,0,127.0.0.1] Unhandled Error
+	Traceback (most recent call last):
+	  File "/usr/lib/python2.7/dist-packages/twisted/protocols/basic.py", line 564, in dataReceived
+	    why = self.lineReceived(line)
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/http.py", line 1551, in lineReceived
+	    self.allContentReceived()
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/http.py", line 1618, in allContentReceived
+	    req.requestReceived(command, path, version)
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/http.py", line 773, in requestReceived
+	    self.process()
+	--- <exception caught here> ---
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/server.py", line 131, in process
+	    resrc = self.site.getResourceFor(self)
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/server.py", line 562, in getResourceFor
+	    return resource.getChildForRequest(self.resource, request)
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/resource.py", line 65, in getChildForRequest
+	    resource = resource.getChildWithDefault(pathElement, request)
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/resource.py", line 169, in getChildWithDefault
+	    return self.getChild(path, request)
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/static.py", line 314, in getChild
+	    return resource.IResource(processor(fpath.path, self.registry))
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/script.py", line 64, in ResourceScript
+	    execfile(path, glob, glob)
+	  File "/home/danarky/pirategrid/index.rpy", line 88, in <module>
+	    reactor.listenTCP(8080, factory)
+	  File "/usr/lib/python2.7/dist-packages/twisted/internet/posixbase.py", line 431, in listenTCP
+	    p.startListening()
+	  File "/usr/lib/python2.7/dist-packages/twisted/internet/tcp.py", line 622, in startListening
+	    raise CannotListenError, (self.interface, self.port, le)
+	twisted.internet.error.CannotListenError: Couldn't listen on any:8080: [Errno 98] Address already in use.
+	
+2012-07-05 16:09:44-0400 [HTTPChannel,0,127.0.0.1] 127.0.0.1 - - [05/Jul/2012:20:09:44 +0000] "GET / HTTP/1.1" 500 9356 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-05 16:10:07-0400 [-] Received SIGTERM, shutting down.
+2012-07-05 16:10:07-0400 [-] (TCP Port 8080 Closed)
+2012-07-05 16:10:07-0400 [-] Stopping factory <twisted.web.server.Site instance at 0x7fabcd98c758>
+2012-07-05 16:10:07-0400 [-] Main loop terminated.
+2012-07-05 16:10:07-0400 [-] Server Shut Down.
+2012-07-05 16:10:24-0400 [-] Log opened.
+2012-07-05 16:10:24-0400 [-] twistd 11.1.0 (/usr/bin/python 2.7.2) starting up.
+2012-07-05 16:10:24-0400 [-] reactor class: twisted.internet.pollreactor.PollReactor.
+2012-07-05 16:10:24-0400 [-] Site starting on 8080
+2012-07-05 16:10:24-0400 [-] Starting factory <twisted.web.server.Site instance at 0x7fe7427c9758>
+2012-07-05 16:10:26-0400 [HTTPChannel,0,127.0.0.1] Unhandled Error
+	Traceback (most recent call last):
+	  File "/usr/lib/python2.7/dist-packages/twisted/protocols/basic.py", line 564, in dataReceived
+	    why = self.lineReceived(line)
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/http.py", line 1551, in lineReceived
+	    self.allContentReceived()
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/http.py", line 1618, in allContentReceived
+	    req.requestReceived(command, path, version)
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/http.py", line 773, in requestReceived
+	    self.process()
+	--- <exception caught here> ---
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/server.py", line 131, in process
+	    resrc = self.site.getResourceFor(self)
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/server.py", line 562, in getResourceFor
+	    return resource.getChildForRequest(self.resource, request)
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/resource.py", line 65, in getChildForRequest
+	    resource = resource.getChildWithDefault(pathElement, request)
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/resource.py", line 169, in getChildWithDefault
+	    return self.getChild(path, request)
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/static.py", line 314, in getChild
+	    return resource.IResource(processor(fpath.path, self.registry))
+	  File "/usr/lib/python2.7/dist-packages/twisted/web/script.py", line 64, in ResourceScript
+	    execfile(path, glob, glob)
+	  File "/home/danarky/pirategrid/index.rpy", line 88, in <module>
+	    reactor.listenTCP(8080, factory)
+	  File "/usr/lib/python2.7/dist-packages/twisted/internet/posixbase.py", line 431, in listenTCP
+	    p.startListening()
+	  File "/usr/lib/python2.7/dist-packages/twisted/internet/tcp.py", line 622, in startListening
+	    raise CannotListenError, (self.interface, self.port, le)
+	twisted.internet.error.CannotListenError: Couldn't listen on any:8080: [Errno 98] Address already in use.
+	
+2012-07-05 16:10:26-0400 [HTTPChannel,0,127.0.0.1] 127.0.0.1 - - [05/Jul/2012:20:10:25 +0000] "GET / HTTP/1.1" 500 9356 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-05 16:10:32-0400 [-] Received SIGTERM, shutting down.
+2012-07-05 16:10:32-0400 [-] (TCP Port 8080 Closed)
+2012-07-05 16:10:32-0400 [-] Stopping factory <twisted.web.server.Site instance at 0x7fe7427c9758>
+2012-07-05 16:10:32-0400 [-] Main loop terminated.
+2012-07-05 16:10:32-0400 [-] Server Shut Down.
+2012-07-06 08:46:25-0400 [-] Log opened.
+2012-07-06 08:46:25-0400 [-] twistd 11.1.0 (/usr/bin/python 2.7.2) starting up.
+2012-07-06 08:46:25-0400 [-] reactor class: twisted.internet.pollreactor.PollReactor.
+2012-07-06 08:46:25-0400 [-] Site starting on 8080
+2012-07-06 08:46:25-0400 [-] Starting factory <twisted.web.server.Site instance at 0x2be7e60>
+2012-07-06 08:46:46-0400 [-] Received SIGTERM, shutting down.
+2012-07-06 08:46:46-0400 [-] (TCP Port 8080 Closed)
+2012-07-06 08:46:46-0400 [-] Stopping factory <twisted.web.server.Site instance at 0x2be7e60>
+2012-07-06 08:46:46-0400 [-] Main loop terminated.
+2012-07-06 08:46:46-0400 [-] Server Shut Down.
+2012-07-14 18:42:42-0400 [-] Log opened.
+2012-07-14 18:42:42-0400 [-] twistd 11.1.0 (/usr/bin/python 2.7.2) starting up.
+2012-07-14 18:42:42-0400 [-] reactor class: twisted.internet.pollreactor.PollReactor.
+2012-07-14 18:42:42-0400 [-] Site starting on 8080
+2012-07-14 18:42:42-0400 [-] Starting factory <twisted.web.server.Site instance at 0x1c70908>
+2012-07-14 18:42:54-0400 [HTTPChannel,0,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:42:53 +0000] "GET /chat.rpy HTTP/1.1" 200 4 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:42:57-0400 [HTTPChannel,0,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:42:56 +0000] "GET / HTTP/1.1" 200 1531 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:42:57-0400 [HTTPChannel,0,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:42:56 +0000] "GET /css/mediagrid.css HTTP/1.1" 304 - "http://127.0.0.1:8080/" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:42:57-0400 [HTTPChannel,1,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:42:56 +0000] "GET /css/chat2.png HTTP/1.1" 304 - "http://127.0.0.1:8080/" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:42:57-0400 [HTTPChannel,0,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:42:56 +0000] "GET /js/startpage.js HTTP/1.1" 304 - "http://127.0.0.1:8080/" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:42:59-0400 [HTTPChannel,0,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:42:58 +0000] "GET /?dir= HTTP/1.1" 200 6815 "http://127.0.0.1:8080/" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:42:59-0400 [HTTPChannel,0,127.0.0.1] polltime = 1342229478.25
+2012-07-14 18:43:00-0400 [HTTPChannel,0,127.0.0.1] Unhandled error in Deferred:
+2012-07-14 18:43:00-0400 [HTTPChannel,0,127.0.0.1] Unhandled Error
+	Traceback (most recent call last):
+	Failure: twisted.internet.error.ConnectionDone: Connection was closed cleanly.
+	
+2012-07-14 18:43:24-0400 [HTTPChannel,1,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:43:23 +0000] "GET /?dir= HTTP/1.1" 200 6815 "http://127.0.0.1:8080/" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:43:24-0400 [HTTPChannel,1,127.0.0.1] polltime = 1342229478.25
+2012-07-14 18:43:25-0400 [HTTPChannel,1,127.0.0.1] Unhandled error in Deferred:
+2012-07-14 18:43:25-0400 [HTTPChannel,1,127.0.0.1] Unhandled Error
+	Traceback (most recent call last):
+	Failure: twisted.internet.error.ConnectionDone: Connection was closed cleanly.
+	
+2012-07-14 18:43:25-0400 [HTTPChannel,2,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:43:24 +0000] "GET /?dir= HTTP/1.1" 200 6815 "http://127.0.0.1:8080/" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:43:25-0400 [HTTPChannel,2,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:43:25 +0000] "GET /css/mediagrid.css HTTP/1.1" 304 - "http://127.0.0.1:8080/?dir=" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:43:25-0400 [HTTPChannel,3,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:43:25 +0000] "GET /js/jquery-1.7.2.min.js HTTP/1.1" 304 - "http://127.0.0.1:8080/?dir=" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:43:25-0400 [HTTPChannel,4,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:43:25 +0000] "GET /js/poll.js HTTP/1.1" 304 - "http://127.0.0.1:8080/?dir=" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:43:25-0400 [HTTPChannel,2,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:43:25 +0000] "GET /css/headliner.ttf HTTP/1.1" 304 - "http://127.0.0.1:8080/css/mediagrid.css" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:43:25-0400 [HTTPChannel,2,127.0.0.1] polltime = 1342229478.25
+2012-07-14 18:43:35-0400 [HTTPChannel,2,127.0.0.1] Unhandled error in Deferred:
+2012-07-14 18:43:35-0400 [HTTPChannel,2,127.0.0.1] Unhandled Error
+	Traceback (most recent call last):
+	Failure: twisted.internet.error.ConnectionDone: Connection was closed cleanly.
+	
+2012-07-14 18:43:35-0400 [HTTPChannel,3,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:43:34 +0000] "GET /?dir= HTTP/1.1" 200 6815 "http://127.0.0.1:8080/" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:43:35-0400 [HTTPChannel,3,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:43:35 +0000] "GET /css/mediagrid.css HTTP/1.1" 304 - "http://127.0.0.1:8080/?dir=" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:43:35-0400 [HTTPChannel,4,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:43:35 +0000] "GET /js/jquery-1.7.2.min.js HTTP/1.1" 304 - "http://127.0.0.1:8080/?dir=" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:43:35-0400 [HTTPChannel,5,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:43:35 +0000] "GET /js/poll.js HTTP/1.1" 304 - "http://127.0.0.1:8080/?dir=" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:43:35-0400 [HTTPChannel,3,127.0.0.1] 127.0.0.1 - - [14/Jul/2012:22:43:35 +0000] "GET /css/headliner.ttf HTTP/1.1" 304 - "http://127.0.0.1:8080/css/mediagrid.css" "Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
+2012-07-14 18:43:35-0400 [HTTPChannel,3,127.0.0.1] polltime = 1342229478.25
+2012-07-14 18:43:44-0400 [-] Received SIGTERM, shutting down.
+2012-07-14 18:43:44-0400 [-] (TCP Port 8080 Closed)
+2012-07-14 18:43:44-0400 [-] Stopping factory <twisted.web.server.Site instance at 0x1c70908>
+2012-07-14 18:43:44-0400 [HTTPChannel,3,127.0.0.1] Unhandled error in Deferred:
+2012-07-14 18:43:44-0400 [HTTPChannel,3,127.0.0.1] Unhandled Error
+	Traceback (most recent call last):
+	Failure: twisted.internet.error.ConnectionLost: Connection to the other side was lost in a non-clean fashion: Connection lost.
+	
+2012-07-14 18:43:44-0400 [-] Main loop terminated.
+2012-07-14 18:43:44-0400 [-] Server Shut Down.

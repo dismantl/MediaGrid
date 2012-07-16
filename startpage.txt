@@ -1,0 +1,81 @@
+<html xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1">
+<head><title>Media Grid</title>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<link href="/css/mediagrid.css" type="text/css" rel="stylesheet" />
+</head>
+<body id="mediagrid-startpage">
+
+<h1 id="title" style="text-align:center;position:absolute;width:100%;left:0;top:0">MediaGrid</h1>
+
+<div id="DirButton" class="buttonleft" style="width:300px;height:300px;position:absolute">
+<div id="DirButtonBox" style="width:100%;height:100%">
+<img id="image" src="/css/arrow2.png" class="icon" style="margin:auto;display:block;position:relative;top:40px" />
+
+</div>
+</div>
+
+
+
+<div id="DirButton2" style="width:300px;height:300px;position:absolute">
+<div id="DirButton2Box" class="buttonright" style="width:300px;height:300px;position:absolute">
+<a id="DirListing2" href="/?dir="><img src="/css/list2.png" class="icon" style="margin:auto;display:block;position:relative;top:40px" /></a>
+
+</div>
+</div>
+
+<script type="text/javascript" src="/js/jquery-1.7.2.min.js" />
+<script type="text/javascript" src="/js/jquery-ui-1.8.21.custom.min.js"></script>
+<script type="text/javascript" src="/js/jquery.ocupload-1.1.2.js"></script>
+<script type="text/javascript">
+var h = window.innerHeight;
+var w = window.innerWidth;
+//var b = 300;
+var b = h/2;
+//var b1 = $('#DirListing').attr('href');
+var b2 = $('#DirListing2').attr('href');
+
+$(document).ready(function(){
+	$('#DirListing2').attr('href','javascript:void(0);');
+	$('.icon').css({'height':h*11/30,'top':h*2/30 + 'px'});
+	$('#DirButton').css({'top':(h-b)/2, 'left':(w/2)-b, 'width':b, 'height':b});
+	$('#DirButton2').css({'top':(h-b)/2, 'left':w/2, 'width':b, 'height':b});
+	$('#DirButton2Box').css({'width':b, 'height':b});
+	$('#title').css('top',(h-b)/2-70);
+	var toupload = $('#DirButtonBox').upload({
+		name:'file', 
+		action: '.', 
+		autoSubmit: true, 
+		params: {
+			'when_done': '', 
+			't': 'upload',
+			'replace': 'false'
+		}, 
+		onComplete: function(){
+			Explode(function() {
+				location.href=b2;
+			});
+		}/*, 
+		onSubmit: function(){
+			if (document.getElementById('file').value) {
+			toupload.params({'filename':document.getElementById('file').value}); }
+		}*/
+	});
+});
+
+$('#DirButton2').click(function(){
+	Explode(function() {location.href=b2;});
+});
+
+function Explode(func) {
+	var speed = 400;
+	$('#blahblah').css({'width': '100%', 'height': '100%', 'left':'0', 'top':'0', 'overflow':'hidden'});
+	$('#DirButton').css({'top':(h-b)/2, 'left':(w/2)-b});
+	$('#DirButton2').css({'width': '100%', 'height': '100%', 'left': '0', 'top':'0', 'overflow':'hidden'});
+	$('#DirButton2Box').css({'top':(h-b)/2, 'left':w/2});
+	$('#DirButton').animate({'left': '-=' + (w/2) + 'px'}, speed, 'easeInCubic');	
+	$('#DirButton2').animate({'left': '+=' + (w/2) + 'px'}, speed, 'easeInCubic', func);
+}
+
+</script>
+
+</body></html>

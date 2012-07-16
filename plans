@@ -1,0 +1,22 @@
+portal page:
+-upload form
+--how to prevent spamming?
+-file listing (previews/streaming might be too much resources for a pi)
+--make it look like a newspaper? or a feed?
+-public cryptocat
+--identity verification? how does cryptocat do this?
+-option to join specified cryptocat (for private comms)
+
+
+setup page/script:
+-create directory
+--insert directory caps into portal page
+-create chat
+--insert chat room name into portal page
+
+
+
+control/status page:
+-number of files, file sizes, stats, etc.
+-cryptocat
+
