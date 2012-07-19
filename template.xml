@@ -52,10 +52,10 @@
 
 <fieldset id="logos">
   <h3>Powered by:</h3>
-  <a href="https://tahoe-lafs.org/" target="_blank"><img src="/tahoe_small.png" /></a>
-  <a href="http://www.olsr.org/" target="_blank"><img src="/olsr_small.jpg" /></a>
-  <a href="http://www.debian.org/" target="_blank"><img src="/debian_small.png" /></a>
-  <a href="http://www.raspberrypi.org/" target="_blank"><img src="/raspberry_pi_small.png" /></a>
+  <a href="https://tahoe-lafs.org/" target="_blank"><img src="/images/tahoe_small.png" /></a>
+  <a href="http://www.olsr.org/" target="_blank"><img src="/images/olsr_small.jpg" /></a>
+  <a href="http://www.debian.org/" target="_blank"><img src="/images/debian_small.png" /></a>
+  <a href="http://www.raspberrypi.org/" target="_blank"><img src="/images/raspberry_pi_small.png" /></a>
 </fieldset>
 
 </div>
