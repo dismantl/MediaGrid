@@ -62,6 +62,7 @@ body.tahoe-directory-page {
   margin: 1em 0; /* zero margin so the table can be flush */
 }
 table.tahoe-directory {
+  margin-top:1.2em;
   color: black;
   background: white;
   width: 100%;
@@ -145,4 +146,25 @@ margin:0;
 #logos img {
 height:50px;
 margin:0 3em;
+}
+
+#message {
+margin:0;
+position:absolute;
+text-align:center;
+width:100%;
+}
+
+#path {
+position:absolute;
+}
+
+#message h4 {
+margin:0;
+display:inline-block;
+background:#FFFF66;
+padding:2px;
+border: 1px solid #AAAA00;
+position:relative;
+bottom:8px;
 }

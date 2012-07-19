@@ -4,7 +4,6 @@ var b3 = $('#DirListing3').attr('href');
 var sleep = true;
 
 function Setup() {
-	//check orientation, window.screen.width/height, window.innerWidth/Height
 	h = window.innerHeight;
 	w = window.innerWidth;
 	vert = (h > w);
@@ -41,11 +40,7 @@ function Setup() {
 			Explode(function() {
 				location.href=b2;
 			});
-		}/*, 
-		onSubmit: function(){
-			if (document.getElementById('file').value) {
-			toupload.params({'filename':document.getElementById('file').value}); }
-		}*/
+		}
 	});
 }
 
@@ -60,12 +55,7 @@ $(document).ready(function(){
 	window.addEventListener("resize", Rotate, false);
 	window.addEventListener("orientationchange", Rotate, false);
 	window.onorientationchange = Rotate;
-	//setTimeout('Setup()',200);
 	Setup();
-	//alert(h);
-	//alert(w);
-	//alert(vert);
-	//alert(b);
 	$('#DirListing2').attr('href','javascript:void(0);');
 	$('#DirListing3').attr('href','javascript:void(0);');
 });
@@ -84,7 +74,6 @@ $('#DirButton3').click(function(){
 
 function Explode(func) {
 	var speed = 400;
-	//$('#blahblah').css({'width': '100%', 'height': '100%', 'left':'0', 'top':'0', 'overflow':'hidden'});
 	$('#DirButton2').css({'width': '100%', 'height': '100%', 'left': '0', 'top':'0', 'overflow':'hidden'});
 	$('#DirButton3').css({'width': '100%', 'height': '100%', 'left': '0', 'top':'0', 'overflow':'hidden'});
 	if (vert) {

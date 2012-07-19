@@ -7,7 +7,9 @@
 
 <h1><a href="/" style="color:black">MediaGrid</a></h1>
 
+<div id="path">
 <a class="breadcrumb" t:render="breadcrumb"><t:attr name="href"><t:slot name="backurl" /></t:attr><t:slot name="backtext" /> »</a><t:transparent t:render="current" />
+</div>
 
 <div>
   <table class="tahoe-directory"><tr id="headers">
@@ -52,23 +54,11 @@
   <h3>Powered by:</h3>
   <a href="https://tahoe-lafs.org/" target="_blank"><img src="/tahoe_small.png" /></a>
   <a href="http://www.olsr.org/" target="_blank"><img src="/olsr_small.jpg" /></a>
+  <a href="http://www.debian.org/" target="_blank"><img src="/debian_small.png" /></a>
+  <a href="http://www.raspberrypi.org/" target="_blank"><img src="/raspberry_pi_small.png" /></a>
 </fieldset>
 
 </div>
-
-
-
-<!--<form method="POST" enctype="multipart/form-data" action=".">
-  <input type="text" name="the-field" />
-  <input type="submit" value="Send" />
-</form>-->
-
-<!--<script type="text/javascript">
-document.getElementById('submit').onclick = function(){
-	var filename = document.getElementById('file').value;
-	document.getElementById('filename').setAttribute('value',filename);
-}
-</script>-->
 
 <script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
 <script type="text/javascript" src="/js/poll.js"></script>
