@@ -1,7 +1,7 @@
 MediaGrid
 =========
 
-MediaGrid is a censorship-resistant, distributed wireless infrastructure allowing citizens to share real-time video and photo documentation at public demonstrations. A MediaGrid uses a distributed filesystem running on a wireless mesh network of wifi-equipped Raspberry Pi's. Smartphones (or any wifi-enabled device) within range can then connect to the network and upload files.
+MediaGrid is a censorship-resistant, distributed wireless infrastructure allowing citizens to share real-time photo and video documentation at public demonstrations. A MediaGrid uses a distributed filesystem running on a wireless mesh network of wifi-equipped Raspberry Pi's. Smartphones (or any wifi-enabled device) within range can then connect to the network and upload files.
 
 Completed/under development:
 * Front-end web server for uploading files
@@ -16,7 +16,7 @@ Requirements
 ------------
 
 * Tahoe-LAFS (https://tahoe-lafs.org)
-* OLSRd
+* OLSRd (http://www.olsr.org)
 * python >= 2.7
 * Twisted Web (http://twistedmatrix.com/trac/wiki/TwistedWeb)
 * requests (http://docs.python-requests.org/en/latest/index.html)
@@ -24,7 +24,7 @@ Requirements
 Installation
 ------------
 
-This section describes the procedure for installing the front-end web server. I recommend using an SD card preloaded with Debian Wheezy. Images and instructions for preparing the SD card can be found on the Raspberry Pi website: http://www.raspberrypi.org/downloads.
+This section describes the procedure for installing Tahoe-LAFS and the front-end web server. I recommend using an SD card preloaded with Debian Wheezy. Images and instructions for preparing the SD card can be found on the Raspberry Pi website: http://www.raspberrypi.org/downloads.
 
 Once you get the Raspberry Pi up and running (again, refer to the Raspberry Pi website for help), run the following commands from your home directory in the terminal:
 
