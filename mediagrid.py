@@ -8,6 +8,6 @@ root.processors = {'.rpy': script.ResourceScript}
 application = service.Application('web')
 site = server.Site(root)
 sc = service.IServiceCollection(application)
-i = internet.TCPServer(8080, site)
+i = internet.TCPServer(80, site)
 i.setServiceParent(sc)
 
