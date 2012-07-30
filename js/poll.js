@@ -10,7 +10,7 @@ getData($('.epoch').first().text());
 
 });
 
-var getData = function(lastupdate) {
+function getData(lastupdate) {
 var polltime;
 if (lastupdate) { polltime = lastupdate; } else { polltime = ''; }
 $.ajax({

@@ -19,26 +19,12 @@ host = '127.0.0.1:3456'   # host/port of local Tahoe server
 port = 80   # port that MediaGrid is listening on
 urlTemplate = 'http://' + host + '/uri'
 
-####### SETUP #######
-try:
-    wc = open('writecap')
-    rc = open('readcap')
-    writecap = wc.read()
-    readcap = rc.read()
-    wc.close()
-    rc.close()
-except IOError:
-    req = requests.put(urlTemplate + '?t=mkdir')
-    writecap = req.text
-    req = requests.get('%s/%s?t=json' % (urlTemplate, writecap))
-    jresp = json.loads(req.text)
-    readcap = jresp[1]['ro_uri']
-    wc = open('writecap','w')
-    wc.write(writecap)
-    rc = open('readcap','w')
-    rc.write(readcap)
-    wc.close()
-    rc.close()
+wc = open('writecap')
+rc = open('readcap')
+writecap = wc.read()
+readcap = rc.read()
+wc.close()
+rc.close()
 
 url = urlTemplate + '/' + readcap
 

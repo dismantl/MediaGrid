@@ -5,7 +5,7 @@
 </head>
 <body class="tahoe-directory-page">
 
-<h1><a href="/" style="color:black">MediaGrid</a></h1>
+<h1><a id="header" href="/">MediaGrid</a></h1>
 
 <div id="path">
 <a class="breadcrumb" t:render="breadcrumb"><t:attr name="href"><t:slot name="backurl" /></t:attr><t:slot name="backtext" /> »</a><t:transparent t:render="current" />
