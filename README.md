@@ -1,14 +1,14 @@
 MediaGrid
 =========
 
-MediaGrid is a censorship-resistant, distributed wireless infrastructure allowing citizens to share real-time photo and video documentation at public demonstrations. A MediaGrid uses a distributed filesystem running on a wireless mesh network of wifi-equipped Raspberry Pi's. Smartphones (or any wifi-enabled device) within range can then connect to the network and upload files.
+MediaGrid is a **takedown-resistant, distributed wireless infrastructure** allowing citizens to **share real-time photo and video documentation** at public demonstrations. A MediaGrid uses a distributed filesystem running on a wireless mesh network of wifi-equipped Raspberry Pi's. Smartphones (or any wifi-enabled device) within range can then connect to the network and upload files. **ALL files uploaded to the grid are completely recoverable even if a majority of the devices are confiscated or taken offline**. See the design document for more details: https://github.com/danstaples/MediaGrid/blob/master/MediaGrid.Design.pdf?raw=true.
 
-Completed/under development:
-* Front-end web server for uploading files
+Implemented/under development:
+* Front-end web application for uploading files
+* Webchat, including public and private chatrooms
 
 TODO:
 * OLSRd configuration
-* chat functionality
 * documentation
 * installation/configuration scripts
 
