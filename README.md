@@ -11,6 +11,7 @@ TODO:
 * OLSRd configuration
 * documentation
 * installation/configuration scripts
+* custom Debian image for the RPi
 
 Requirements
 ------------
