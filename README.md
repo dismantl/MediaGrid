@@ -21,7 +21,7 @@ Requirements
 * Twisted Web (http://twistedmatrix.com/trac/wiki/TwistedWeb)
 * requests (http://docs.python-requests.org/en/latest/index.html)
 
-Installation
+Installation (not finished)
 ------------
 
 This section describes the procedure for installing Tahoe-LAFS and the front-end web server. I recommend using an SD card preloaded with Debian Wheezy. Images and instructions for preparing the SD card can be found on the Raspberry Pi website: http://www.raspberrypi.org/downloads.
