@@ -12,6 +12,7 @@ TODO:
 * documentation
 * installation/configuration scripts
 * custom Debian image for the RPi
+* native Android, iOS clients
 
 Requirements
 ------------
