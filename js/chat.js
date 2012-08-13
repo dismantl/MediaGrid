@@ -7,25 +7,91 @@ var getreq = 0;
 var users = [];
 var lastmsg = 0;
 
-//SETUP
-$('#fullscreen').addClass('startup');
-$('#popup').fadeIn('slow', function() {
-	$('#name').attr('maxLength',10).focus().select();
-});
+startup();
 
-$('#name').keyup(function(e) {
-        if (e.keyCode == 13) {
-		startup();
-        }
-});
+function startup() {
+$.ajax({
+    url: window.location,
+    type: "POST",
+    data: "startup=",
+    success: function(response) {
+	if (response === 'notregistered') {
+	    $('#messages').css('width','600px');
+	    $('#users').hide();
+	    $('#fullscreen').show().addClass('register');
+	    $('#popup').fadeIn('slow', function() {
+		    $('#name').attr('maxLength',10).focus().select();
+	    });
+	    
+	    $('#name').keyup(function(e) {
+		    if (e.keyCode == 13) {
+			    register();
+		    }
+	    });
 
-$('#okay').click(startup);
+	    $('#okay').click(register);
+	
+	} else {
+	    $('#popup').show();
+	    users = response['users'];
+	    lastmsg = response['time'];
+	    username = response['username'];
+	    $.each(users, function(i, val) {
+		$('<p>' + val + '</p>').appendTo('#users').addClass(val);
+		if (val == username) {
+		    $('.' + val).addClass('myname');
+		}
+	    });
+	    $('#inputbox').focus();
+	    getMsg(); //let's get jiggy with it
+	}
+    },
+    error: function(XMLHttpRequest, textStatus, errorThrown) {
+	setTimeout('startup();', 1000);
+    }
+});
+}
+
+function register() {
+	if (!$('#name').val().match(/^[0-9a-z]+$/)) {
+		$('#name').val('letters & numbers only!');
+		$('#name').focus().select();
+	} else {
+		//send username to server
+		$.ajax({
+			url: window.location,
+			type: "POST",
+			data: "t=register&username=" + $('#name').val(),// + "&room=" + room,
+			success: function(response) {
+				if (response === "inuse") {
+					$('#name').val('Username taken, try again').select();
+				}
+				else {
+					username = $('#name').val();
+					$('#name, #okay').off();
+					$('#fullscreen').fadeOut('fast', function() {$(this).removeClass('register');});
+					$('#inputbox').focus();
+					$('#users').show(0);
+					$('#messages').css('width','500px');
+					users = response['users'];
+					$.each(users, function(i, val) {
+						$('<p>' + val + '</p>').appendTo('#users').addClass(val);
+					});
+					lastmsg = response['time'];
+					getMsg(); //let's get jiggy with it
+
+				}
+			}
+		});
+	}
+}
 
 //long-poll for messages
 function getMsg() {
 	getreq = $.ajax({
-		type: "GET",
-		url: window.location + '?msgtime='+lastmsg+'&room='+room,
+		type: "POST",
+		url: window.location,
+		data: 'msgtime='+lastmsg+'&room='+room,
 		async: true,
 		timeout:30000,
 		success: function(msgs) {
@@ -33,7 +99,10 @@ function getMsg() {
 				if ('join' in val) {
 					users.push(val['join']);
 					addLine(ich.newuser(val));
-					$('<p><strong>' + val['join'] + '</strong></p>').appendTo('#users').addClass(val['join']);
+					$('<p>' + val['join'] + '</p>').appendTo('#users').addClass(val['join']);
+					if (val['join'] === username) {
+					    $('.' + username).addClass('myname');
+					}
 				} else if ('left' in val) {
 					users.splice(users.indexOf(val['left']),1);
 					addLine(ich.userleft(val));
@@ -43,7 +112,11 @@ function getMsg() {
 					$('.' + val['old']).remove();
 					users.push(val['nick']);
 					addLine(ich.newnick(val));
-					$('<p><strong>' + val['nick'] + '</strong></p>').appendTo('#users').addClass(val['nick']);
+					$('<p>' + val['nick'] + '</p>').appendTo('#users').addClass(val['nick']);
+					if (val['old'] === username) {
+					    username = val['nick'];
+					    $('.' + username).addClass('myname');
+					}
 				} else if ('motd' in val) {
 					addLine('<div class="line">Announcement: ' + val['motd'] + '</div>');
 				} else {
@@ -84,7 +157,8 @@ function postMsg() {
 	$.ajax({
 		url: window.location,
 		type: "POST",
-		data: 'username=' + username + '&room=' + room + '&msg=' + queue[0],
+		//data: 'username=' + username + '&room=' + room + '&msg=' + queue[0],
+		data: 'room=' + room + '&msg=' + queue[0],
 		success: function(response) {
 			queue.splice(0, 1);
 			if (queue[0]) { postMsg(); }
@@ -102,7 +176,8 @@ function joinRoom() {
 		url: window.location,
 		type: 'POST',
 		async: true,
-		data: 't=join&new=' + tojoin + '&username=' + username + '&room=' + room,
+		//data: 't=join&new=' + tojoin + '&username=' + username + '&room=' + room,
+		data: 't=join&new=' + tojoin + '&room=' + room,
 		success: function(response) {
 			$('#messages').empty();
 			$('#users').empty();
@@ -113,7 +188,10 @@ function joinRoom() {
 			addLine('<div class="line">Joined room: ' + room + '</div>');
 			users = response['users'];
 			$.each(users, function(i, val) {
-				$('<p><strong>' + val + '</strong></p>').appendTo('#users').addClass(val);
+				$('<p>' + val + '</p>').appendTo('#users').addClass(val);
+				if (val == username) {
+				    $('.' + val).addClass('myname');
+				}
 			});
 			lastmsg = response['time'];
 			getreq.abort();
@@ -129,7 +207,8 @@ function newRoom() {
 		url: window.location,
 		type: 'POST',
 		async: true,
-		data: 't=mkdir&username=' + username + '&room=' + room,
+		//data: 't=mkdir&username=' + username + '&room=' + room,
+		data: 't=mkdir&room=' + room,
 		success: function(response) {
 			$('#menu').hide();
 			$('#messages').empty();
@@ -168,7 +247,8 @@ function changeNick() {
 			url: window.location,
 			type: 'POST',
 			async: true,
-			data: 't=newnick&username=' + username + '&room=' + room + '&newnick=' + nick,
+			//data: 't=newnick&username=' + username + '&room=' + room + '&newnick=' + nick,
+			data: 't=newnick&room=' + room + '&newnick=' + nick,
 			success: function(response) {
 				if (response === 'inuse') {
 					$('#name').val('Username taken, try again').select();
@@ -202,47 +282,17 @@ function logout() {
 		url: window.location,
 		type: 'POST', 
 		async: false,
-		data: 't=logout&username=' + username + '&room=' + room
+		//data: 't=logout&username=' + username + '&room=' + room,
+		data: 't=logout&room=' + room,
+		/*success: function(response) {
+		    document.cookie = 'TWISTED_SESSION=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+		}*/
 	});
 }
 
 function addLine(line) {
 	if (tag === 'line-odd') { tag = 'line-even'; } else { tag = 'line-odd'; }
 	$(line).appendTo('#messages').addClass(tag);
-}
-
-function startup() {
-	if (!$('#name').val().match(/^[0-9a-z]+$/)) {
-		$('#name').val('letters & numbers only!');
-		$('#name').focus().select();
-	} else {
-		//send username to server
-		$.ajax({
-			url: window.location,
-			type: "POST",
-			data: "t=register&username=" + $('#name').val() + "&room=" + room,
-			success: function(response) {
-				if (response === "inuse") {
-					$('#name').val('Username taken, try again').select();
-				}
-				else {
-					username = $('#name').val();
-					$('#name, #okay').off();
-					$('#fullscreen').fadeOut('fast', function() {$(this).removeClass('startup');});
-					$('#inputbox').focus();
-					$('#users').show(0);
-					$('#messages').css('width','500px');
-					users = response['users'];
-					$.each(users, function(i, val) {
-						$('<p><strong>' + val + '</strong></p>').appendTo('#users').addClass(val);
-					});
-					lastmsg = response['time'];
-					getMsg(); //let's get jiggy with it
-
-				}
-			}
-		});
-	}
 }
 
 

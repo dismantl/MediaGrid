@@ -4,7 +4,7 @@ import requests
 
 ###### SETTINGS ######
 host = '127.0.0.1:3456'   # host/port of local Tahoe server
-port = 80   # port that MediaGrid is listening on
+port = 8080   # port that MediaGrid is listening on
 urlTemplate = 'http://' + host + '/uri'
 
 ####### SETUP #######

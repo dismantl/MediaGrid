@@ -4,11 +4,17 @@ from twisted.internet import task
 from twisted.web.resource import ErrorPage
 import requests
 import json
+import re
 from time import time, sleep, strftime, localtime
 
 ###### SETTINGS ######
 host = '127.0.0.1:3456'   # host/port of local Tahoe server
-port = 80   # port that MediaGrid is listening on
+#port = 80   # port that MediaGrid is listening on
+filesize = 600
+timelimit = 3600
+genurl = 1
+timeout = 80
+
 urlTemplate = 'http://' + host + '/uri'
 
 cc = open('chatcap')
@@ -22,11 +28,25 @@ class Chat(Resource):
 	requests.put('%s/%s/users?t=mkdir' % (urlTemplate, chatcap))  # create chatroom file directory
 
     def render_GET(self, request):
+	return open("chat.xml").read()
+
+    def render_POST(self, request):
+	session = request.getSession()
+	if "username" in request.args:
+      	    username = request.args["username"][0]
+	    if (len(username) > 10) or (len(username) == 0): raise Exception
+	else:
+	    if 'startup' not in request.args:
+		username = session.username
+	if "room" in request.args:
+	    room = (chatcap if request.args["room"][0] == 'default' else request.args["room"][0])
+	    if len(room) != 88: raise Exception
+	
 	###### Handle AJAX long-polling by client ######
 	if "msgtime" in request.args:
-	    polltime = request.args["msgtime"][0]
 	    room = (chatcap if request.args["room"][0] == 'default' else request.args["room"][0])
-	    session = request.getSession()
+	    if len(room) != 88: raise Exception
+	    polltime = request.args["msgtime"][0]
 	    loop = task.LoopingCall(self.poll, polltime, room, request, session.motd)
 	    session.motd = False
 	    d = loop.start(0.5)
@@ -39,13 +59,20 @@ class Chat(Resource):
  	    crap = request.notifyFinish()
 	    crap.addBoth(lambda x: loop.stop())
 	    return server.NOT_DONE_YET
-	return open("chat.xml").read()
-
-    def render_POST(self, request):
-	room = (chatcap if request.args["room"][0] == 'default' else request.args["room"][0])
-	username = request.args["username"][0]
-	if len(username) > 10: raise Exception
-	if len(room) > 90: raise Exception
+	
+	if 'startup' in request.args:
+		response = {}
+		try: 
+		    response['username'] = session.username
+		    session.rooms[chatcap] += 1
+		    session.motd = True
+		except:
+		    return 'notregistered'
+		response['users'] = self.getUsers()
+		response['time'] = str(int(time() * 1000))
+		request.setHeader('Content-Type', 'application/json')
+		return json.dumps(response)
+	
 	if "t" in request.args:
 	    t = request.args["t"][0]
 
@@ -65,22 +92,24 @@ class Chat(Resource):
 		except:
 		    return 'inuse'
 		requests.delete('%s/%s/users/%s' % (urlTemplate, chatcap, username)) # delete user from global list of online users
-		for itm in self.getDir(room):
-	    	    if itm["name"].startswith('join.' + username):
-			requests.delete('%s/%s/%s' % (urlTemplate, room, itm["name"]))
-		now = time() * 1000
-	    	requests.put('%s/%s/nick.%s.%s.%d' % (urlTemplate, room, newnick, username, now))
-	    	requests.put('%s/%s/join.%s.0' % (urlTemplate, room, newnick))
-		session = request.getSession()
-		session.__dict__[room] = newnick
+		for key, val in session.rooms.iteritems():
+		    for itm in self.getDir(key):
+			if itm["name"].startswith('join.' + username):
+			    requests.delete('%s/%s/%s' % (urlTemplate, key, itm["name"]))
+			    now = time() * 1000
+			    requests.put('%s/%s/nick.%s.%s.%d' % (urlTemplate, key, newnick, username, now))
+			    requests.put('%s/%s/join.%s.0' % (urlTemplate, key, newnick))
+		session.username = newnick
 		return ''
 	    ###### Logout user ######
 	    elif t == 'logout':
-	        if username != '':
+		self.leave_room(request, username, room)
+		if session.rooms == {}:
+		    print 'deleting session'
 		    requests.delete('%s/%s/users/%s' % (urlTemplate, chatcap, username)) # delete user from global list of online users
-		    self.leave_room(request, username, room)
-		    ###### TODO: if no users on server (no files in [chatcap]/users dir), change to new chatcap and unlink old chatcap
-		    return ''
+		    session.expire()
+		###### TODO: if no users on server (no files in [chatcap]/users dir), change to new chatcap and unlink old chatcap
+		return ''
 	    ###### Join private chatroom ######
 	    elif t == 'join':
 		newroom = request.args['new'][0]
@@ -96,18 +125,17 @@ class Chat(Resource):
 		except:
 		    return 'inuse'
 	        now = time() * 1000
-	        users = self.getUsers(room)
-	        requests.put('%s/%s/join.%s.%d' % (urlTemplate, room, username, now))
-	        session = request.getSession()
-	        session.__dict__[room] = username
+	        users = self.getUsers(chatcap)
+	        requests.put('%s/%s/join.%s.%d' % (urlTemplate, chatcap, username, now))
+	        session.rooms = {chatcap: 1}
+	        session.username = username
 		session.motd = True
 	        request.setHeader('Content-Type', 'application/json')
 	        return json.dumps({'time':str(int(now) - 1), 'users':users})
 	else:
 	    ##### Post message to chat #####
-	    session = request.getSession()
 	    try:
-		sesuser = session.__dict__[room]
+		sesuser = session.username
 	    except:
 		return 'error: user not registered'
 	    if sesuser == username:  # make sure user is checked into room before allowing post
@@ -136,7 +164,7 @@ class Chat(Resource):
 	    elif firstpart == 'motd':  # Message of the Day
 		if motd:
 		    req = requests.get('http://%s/file/%s' % (host,itm["readcap"]))
-		    msg = { 'epoch':0,'motd':req.text }
+		    msg = { 'epoch':polltime,'motd':req.text }
 		    msgs.append(msg)
 	    else:  # all other messages
 		if itm['name'] > polltime:
@@ -167,19 +195,25 @@ class Chat(Resource):
 	now = time() * 1000
 	requests.put('%s/%s/join.%s.%d' % (urlTemplate, new, username, now))  # will raise exception if room doesn't exist
 	session = request.getSession()
-	session.__dict__[new] = username  # 
+	try:
+	    session.rooms[new] += 1
+	except:
+	    session.rooms[new] = 1
 	self.leave_room(request, username, old)
 	return now
 
     def leave_room(self, request, username, room):
-	for itm in self.getDir(room):
-	    if itm["name"].startswith('join.' + username):
-		requests.delete('%s/%s/%s' % (urlTemplate, room, itm["name"]))
-		requests.put('%s/%s/left.%s.%d' % (urlTemplate, room, username, time() * 1000))
-		session = request.getSession()
-		del session.__dict__[room]
+	session = request.getSession()
+	if session.rooms[room] == 1:
+	    for itm in self.getDir(room):
+		if itm["name"].startswith('join.' + username):
+		    requests.delete('%s/%s/%s' % (urlTemplate, room, itm["name"]))
+		    requests.put('%s/%s/left.%s.%d' % (urlTemplate, room, username, time() * 1000))
+		    del session.rooms[room]
+	else:
+	    session.rooms[room] -= 1
 
-    def getUsers(self, room):
+    def getUsers(self, room=chatcap):
 	users = []
 	for itm in self.getDir(room):
 	    if itm['name'][:4] == 'join':
@@ -194,9 +228,35 @@ class Chat(Resource):
 	for itm in self.getDir(chatcap + '/users'): # check if requested username already in global list of online users
 	    if itm['name'] == nick: raise Exception
 	requests.put('%s/%s/users/%s' % (urlTemplate, chatcap, nick)) # add user to global list of online users
+	
+    def checkMsg(self, msg):
+	msglist = []
+	msgregex = '/^[a-z]{1,12}\|\w{8}:\s\[:3\]((\w|\/|\+|\?|\(|\)|\=)*\|(\d|a|b|c|d|e|f){128})*\[:3\]$/'
+	msgbeg   = '/^[a-z]{1,12}\|\w{8}:\s\[:3\](\w|\/|\+|\?|\(|\)|\=)*$/'
+	msgmid   = '/^(\w|\/|\+|\?|\(|\)|\=)*$/'
+	msgend   = '/^(\w|\/|\+|\?|\(|\)|\=)*\|(\d|a|b|c|d|e|f){128}\[:3\]$/'
+	if len(msg) > 4096:
+	    for i in range(0, len(msg), 4096):
+		msglist.append(msg[i:i+4096])
+	    for i in msglist:
+		if msglist.index(i) == 0:
+		    if re.search(msgbeg, i) == None: return 0
+		elif msglist.index(i) == (len(msglist)-1):
+		    if re.search(msgend, i) == None: return 0
+		else:
+		    if re.search(msgmid, i) == None: return 0
+	    return 1
+	elif re.search(msgregex, msg):
+	    return 1
+	return 0
+	
+	
 
 resource = Chat()
 
 ##### TODO:
 ##### cron job to delete old chat messages or switch chatcaps?
 ##### store message in filename after time, e.g. '1234567.message goes here', instead of as file contents? (reduces number of requests to Tahoe)
+
+##### cryptocat client:
+##### store user keys in join.xxxx.12345 as well as users/xxxx files

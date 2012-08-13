@@ -182,6 +182,7 @@ position:absolute;
 top:0;
 left:0;
 z-index:100;
+display:none;
 }
 
 #popup {
@@ -203,7 +204,7 @@ position:relative;
 width:90%;
 }
 
-.newroom #okay, .newroom #name, .newroom #popupmsg, .startup #okay, .startup #name, .changename #popupmsg, .changename #name, .changename #okay, .changename #cancel, .joinroom #name, .joinroom #okay, .joinroom #cancel, .joinroom #popupmsg, .alert #popupmsg, .alert #okay {
+.newroom #okay, .newroom #name, .newroom #popupmsg, .register #okay, .register #name, .changename #popupmsg, .changename #name, .changename #okay, .changename #cancel, .joinroom #name, .joinroom #okay, .joinroom #cancel, .joinroom #popupmsg, .alert #popupmsg, .alert #okay {
 display:inline;
 }
 
@@ -253,7 +254,7 @@ height:28px;
 -webkit-border-radius:5px 5px 0 0;
 border-radius:5px 5px 0 0;
 height:437px;
-width:600px;
+width:500px;
 background:#f4f4f4;
 overflow:auto;
 float:left;
@@ -269,7 +270,6 @@ width:95px;
 background:#ffffff;
 height:437px;
 float:left;
-display:none;
 overflow:hidden;
 }
 
@@ -358,4 +358,8 @@ border-bottom:none;
 
 #menu a {
 color:black;
+}
+
+.myname {
+  font-weight:bold;
 }

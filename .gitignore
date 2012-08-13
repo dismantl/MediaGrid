@@ -2,3 +2,7 @@ twistd.pid
 writecap
 readcap
 twistd.log
+new*
+*~
+chatcap
+.*
