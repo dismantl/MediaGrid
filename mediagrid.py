@@ -1,10 +1,11 @@
 from twisted.application import internet, service
 from twisted.web import static, server, script
 import requests
+import json
 
 ###### SETTINGS ######
 host = '127.0.0.1:3456'   # host/port of local Tahoe server
-port = 8080   # port that MediaGrid is listening on
+port = 80   # port that MediaGrid is listening on
 urlTemplate = 'http://' + host + '/uri'
 
 ####### SETUP #######
@@ -48,4 +49,3 @@ site = server.Site(root)
 sc = service.IServiceCollection(application)
 i = internet.TCPServer(port, site)
 i.setServiceParent(sc)
-

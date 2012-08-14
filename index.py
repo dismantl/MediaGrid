@@ -127,23 +127,9 @@ class printFile(Protocol):
 class MediaGrid(Resource):
 
     def render_GET(self, request):
-	###### AJAX long-polling by client ######
-	if "poll" in request.args:
-	    sub = request.args["dir"][0]  # the current directory
-	    polltime = request.args["poll"][0]  # timestamp of newest file client has listed
-	    loop = task.LoopingCall(self.poll, polltime, request, sub)
-	    d = loop.start(5)
-	    def done(ignored):
-		try:
-		    loop.stop()
-		except:
-		    pass
-	    d.addErrback(done)
- 	    crap = request.notifyFinish()
-	    crap.addBoth(lambda x: loop.stop())
-	    return server.NOT_DONE_YET
+	
 	###### Return file contents ######
-	elif "file" in request.args:   
+	if "file" in request.args:   
 	    d = Agent(reactor).request('GET', 'http://%s/file/%s' % (host, request.args["file"][0]))  # get file from Tahoe server
 	    d.addCallback(self.getFile, request)   # then send it on to the client
 	    d.addBoth(lambda x: request.finish())
@@ -159,6 +145,17 @@ class MediaGrid(Resource):
 	    return towrite
 
     def render_POST(self, request):
+	###### AJAX long-polling by client ######
+	if "poll" in request.args:
+	    sub = request.args["dir"][0]  # the current directory
+	    polltime = request.args["poll"][0]  # timestamp of newest file client has listed
+	    loop = task.LoopingCall(self.poll, polltime, request, sub)
+	    d = loop.start(5)
+	    d.addErrback(lambda x: loop.stop())
+ 	    crap = request.notifyFinish()
+	    crap.addBoth(lambda x: loop.stop())
+	    return server.NOT_DONE_YET
+      
 	sub = request.args["when_done"][0]
 	leafs = sub.split('/')
 

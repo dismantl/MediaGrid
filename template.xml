@@ -31,7 +31,7 @@
 <!--<form method="post" enctype="multipart/form-data" action=".">-->
  <fieldset>
   <input type="hidden" name="t" value="mkdir" />
-  <input type="hidden" name="when_done"><t:attr name="value"><t:slot name="whendone" /></t:attr></input>
+  <input type="hidden" id="when_done" name="when_done"><t:attr name="value"><t:slot name="whendone" /></t:attr></input>
   <legend class="freeform-form-label">Create a new directory in this directory</legend>
   New directory name: 
   <input type="text" name="name" />
