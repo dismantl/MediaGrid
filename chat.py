@@ -25,7 +25,7 @@ class Chat(Resource):
 
     def __init__(self, sub=''):
         Resource.__init__(self)
-	#requests.put('%s/%s/users?t=mkdir' % (urlTemplate, chatcap))  # create chatroom file directory
+	requests.put('%s/%s/users?t=mkdir' % (urlTemplate, chatcap))  # create chatroom file directory
 
     def render_GET(self, request):
 	return open("chat.xml").read()
