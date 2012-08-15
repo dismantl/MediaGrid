@@ -41,3 +41,8 @@ For instructions on configuring Tahoe-LAFS, refer to their documentation: https:
 Once you have your Tahoe introducer node running, you can start the tahoe service on each node with `tahoe start`.
 
 Finally, in the mediagrid directory, start the front-end server by running `sudo twistd -y mediagrid.py`. Enjoy!
+
+More info
+-------------
+
+For questions or comments, send me an e-mail to dan.staples [at symbol] riseup [dot symbol] net.
