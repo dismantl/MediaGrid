@@ -14,6 +14,10 @@ TODO:
 * custom Debian image for the RPi
 * native Android, iOS clients
 
+\*Update\*
+------------
+So I've kinda become enamored with CouchDB lately, and given the performance issues I've been having with Tahoe-LAFS, I may just re-write everything using CouchDB.  So stay tuned...
+
 Requirements
 ------------
 
