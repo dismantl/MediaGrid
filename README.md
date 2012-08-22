@@ -49,3 +49,5 @@ More info
 -------------
 
 For questions or comments, send me an e-mail to dan.staples [at symbol] riseup [dot symbol] net.
+
+All donations to the project are appreciated, and will go towards purchasing hardware for testing and development. You can contribute via [Gittip](https://www.gittip.com/danstaples/) or [Flattr](https://flattr.com/profile/danstaples).
