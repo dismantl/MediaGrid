@@ -5,7 +5,7 @@ MediaGrid is a **takedown-resistant, distributed wireless infrastructure** allow
 
 Implemented/under development:
 * Front-end web application for uploading, browsing, and viewing files
-* Webchat, including public and private chatrooms
+* Webchat, including private encrypted chatrooms
 
 TODO:
 * OLSRd configuration
