@@ -14,36 +14,51 @@ TODO:
 * custom Debian image for the RPi
 * native Android, iOS clients
 
+### \*Update\* 9/11/2012
+Today I released the second version of MediaGrid (v2.0?). I've completely gotten rid of my custom python webapp and Tahoe-LAFS as the distributed filesystem, due to performance issues. They have been replaced with CouchDB, a distributed, non-relational database server. Everything is way faster, and my server-side code is probably under 100 lines of javascript. ALSO, encrypted webchat is now included for private chatrooms, thanks to code taken from CryptoCat (https://project.crypto.cat).
+
 ### \*Update\* 8/18/2012
 So I've kinda become enamored with CouchDB lately, and given the performance issues I've been having with Tahoe-LAFS, I may just re-write everything using CouchDB.  So stay tuned...
 
 Requirements
 ------------
 
-* Tahoe-LAFS (https://tahoe-lafs.org)
+* CouchDB (http://couchdb.apache.org)
+* CouchApp (http://couchapp.org)
+* Python 2.x >= 2.5
 * OLSRd (http://www.olsr.org)
-* python >= 2.7
-* Twisted Web (http://twistedmatrix.com/trac/wiki/TwistedWeb)
-* requests (http://docs.python-requests.org/en/latest/index.html)
 
-Installation (not finished)
+Installation
 ------------
 
-This section describes the procedure for installing Tahoe-LAFS and the front-end web server. I recommend using an SD card preloaded with Debian Wheezy. Images and instructions for preparing the SD card can be found on the Raspberry Pi website: http://www.raspberrypi.org/downloads.
+This section describes the procedure for installing the CouchDB server. I recommend using an SD card preloaded with Debian Wheezy. Images and instructions for preparing the SD card can be found on the Raspberry Pi website: http://www.raspberrypi.org/downloads.
 
 Once you get the Raspberry Pi up and running (again, refer to the Raspberry Pi website for help), run the following commands from your home directory in the terminal:
 
-`sudo apt-get update && sudo apt-get install tahoe-lafs olsrd python python-twisted-web python-pip -y`
+    sudo apt-get update && sudo apt-get install couchdb olsrd python python-pip -y
+    sudo pip install couchapp
 
-`sudo pip install requests`
+Modify the `port` and `bind_address` options and add an admin user in the CouchDB configuration file `/etc/couchdb/local.ini`:
 
-`tahoe create-client`
+    [httpd]
+    port = 80
+    bind_address = 0.0.0.0
+    
+    [admins]
+    adminuser = s3cr3tp4ssw0rd
 
-For instructions on configuring Tahoe-LAFS, refer to their documentation: https://tahoe-lafs.org/trac/tahoe-lafs/browser/trunk/docs/configuration.rst. For this particular setup, make sure you turn on storage; set a proper `introducer.furl`; and set `shares.needed`, `shares.happy`, and `shares.total` to suit your particular needs.
+replacing the above credentials with your own.
+    
+Now Restart the CouchDB server:
 
-Once you have your Tahoe introducer node running, you can start the tahoe service on each node with `tahoe start`.
+`sudo service couchdb restart`
 
-Finally, in the mediagrid directory, start the front-end server by running `sudo twistd -y mediagrid.py`. Enjoy!
+From the `mediagrid` directory, push the CouchApps onto the CouchDB server:
+
+    couchapp push media http://adminuser:s3cr3tp4ssw0rd@localhost/media
+    couchapp push chat http://adminuser:s3cr3tp4ssw0rd@localhost/chat
+
+Finally, open up `http://localhost/media/_design/media/index.html` in your web browser to get started. Have fun!
 
 More info
 -------------
