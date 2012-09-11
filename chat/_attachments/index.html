@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head><title>Media Grid</title>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<link href="style/mediagrid.css" type="text/css" rel="stylesheet" />
+  <script src="/_utils/script/sha1.js"></script>
+  <script src="/_utils/script/json2.js"></script>
+  <!--<script src="/_utils/script/jquery.js"></script>-->
+  <script src="script/jquery-1.7.2.min.js"></script>  <!-- needed later version of jQuery than version shipped with CouchDB -->
+  <!--<script src="/_utils/script/jquery.couch.js"></script>-->
+  <script src="script/jquery.couch.js"></script>  <!-- made a couple customizations to jquery.couch.js -->
+  <script src="/_utils/script/jquery.form.js"></script>
+  <script src="script/jquery.mustache.js"></script>
+  <script src="script/build.js"></script>
+</head>
+<body id="mediagrid-chat">
+
+<h1><a href="/test/_design/test/index.html" id="header">MediaGrid</a></h1>
+
+<div id="chat">
+
+<div id="fullscreen">
+  <div id="popup">
+    <div id="popupmsg"></div>
+    <input type="text" id="name" name="name" autocomplete="off" value="Enter nickname">
+    <div>
+      <button id="okay" type="button">Okay</button>
+      <button id="cancel" type="button">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="messages"></div>
+
+<div id="users"></div>
+
+<div id="userinput">
+<input type="text" name="inputbox" id="inputbox" autocomplete="off" maxlength="512">
+<button id="send" name="send" type="button">Send</button>
+<button id="options" type="button"></button>
+<div id="menu">
+  <ul>
+    <a id="joinroom" href="javascript:void(0);"><li>Create/join private room</li></a>
+    <a id="changename" href="javascript:void(0);"><li>Change username</li></a>
+    <a id="logout" href="javascript:void(0);"><li>Logout</li></a>
+  </ul>
+</div>
+</div>
+</div>
+
+<script type="text/javascript" src="script/jquery-ui-1.8.21.custom.min.js"></script>
+<script type="text/javascript" src="script/chat.js"></script>
+
+<script id="user" type="text/x-mustache" charset="utf-8">
+  {{#users}}
+    <p class="{{class}}">{{nick}}</p>
+  {{/users}}
+</script>
+
+<script id="message" type="text/x-mustache" charset="utf-8">
+      {{#items}}
+      <div class='line'>
+	<span class='created_at'>{{created_at}}</span>
+	<span class='nick'>{{nick}}</span>
+	<span class='message'>{{message}}</span>
+      </div>
+      {{/items}}
+</script>
+
+</body></html>

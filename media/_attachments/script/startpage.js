@@ -2,6 +2,11 @@ var h, w, vert, b, d;
 var b2 = $('#DirListing2').attr('href');
 var b3 = $('#DirListing3').attr('href');
 var sleep = true;
+var doc = {};
+
+var path = unescape(document.location.pathname).split('/'),
+	design = path[3],
+	db = $.couch.db(path[1]);
 
 function Setup() {
 	h = window.innerHeight;
@@ -27,15 +32,29 @@ function Setup() {
 	$('#DirButtonBox').parent().css({'width':b, 'height':b});
 	$('#DirButton2Box').css({'width':b, 'height':b});
 	$('#DirButton3Box').css({'width':b, 'height':b});
-	$('#DirButtonBox').upload({
-		name:'file', 
-		action: '.', 
-		autoSubmit: true, 
-		params: {
-			'when_done': '', 
-			't': 'upload',
-			'replace': 'false'
-		}, 
+	//alert($('#DirButtonBox').parent().css('width'));
+	var test = $('#DirButtonBox').upload({
+		name:'_attachments', 
+		autoSubmit: false, 
+		onSelect: function() {
+		  var form = $("form"); 
+		  doc = {
+		    type: 'FILE',
+		    dir: null,
+		    created_at: new Date()
+		  };
+		  db.saveDoc(doc, {
+		    success: function() {
+			test.set({
+			  action: db.uri + $.couch.encodeDocId(doc._id),
+			  params: {
+			    _rev: doc._rev
+			  }
+			});
+			test.submit();
+		    }
+		  });
+		},
 		onComplete: function(){
 			Explode(function() {
 				location.href=b2;

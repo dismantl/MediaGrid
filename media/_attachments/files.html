@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head><title>Media Grid</title>
+<link href="style/mediagrid.css" type="text/css" rel="stylesheet" />
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+  <script src="/_utils/script/sha1.js"></script>
+  <script src="/_utils/script/json2.js"></script>
+  <script src="/_utils/script/jquery.js"></script>
+  <script src="/_utils/script/jquery.couch.js"></script>
+  <script src="/_utils/script/jquery.form.js"></script>
+  <script src="script/jquery.mustache.js"></script>
+</head>
+<body class="tahoe-directory-page">
+
+<h1><a id="header" href="index.html">MediaGrid</a></h1>
+
+<div id="path"></div>
+
+<div id="content"></div>
+
+<div class="tahoe-directory-footer">
+<form id="createdir">
+<!--<form method="post" enctype="multipart/form-data" action=".">-->
+ <fieldset>
+  <!--<input type="hidden" name="t" value="mkdir" />
+  <input type="hidden" id="when_done" name="when_done" value="."></input>-->
+  <legend class="freeform-form-label">Create a new directory in this directory</legend>
+  New directory name: 
+  <input type="text" name="name" />
+  <input type="submit" value="Create" />
+ </fieldset>
+</form>
+<form id="upload">
+<!--<form method="POST" enctype="multipart/form-data" action="/?dir=">-->
+ <fieldset>
+  Upload a file to this directory:
+  <input type="file" id="file" name="_attachments" />
+  <input type="hidden" name="_rev" value="" />
+  <input type="submit" value="Upload" />
+ </fieldset>
+</form>
+<fieldset id="logos">
+  <h3>Powered by:</h3>
+  <a href="https://tahoe-lafs.org/" target="_blank"><img src="style/images/tahoe_small.png" /></a>
+  <a href="http://www.olsr.org/" target="_blank"><img src="style/images/olsr_small.jpg" /></a>
+  <a href="http://www.debian.org/" target="_blank"><img src="style/images/debian_small.png" /></a>
+  <a href="http://www.raspberrypi.org/" target="_blank"><img src="style/images/raspberry_pi_small.png" /></a>
+</fieldset>
+
+</div>
+
+<script id="files" type="text/x-mustache" charset="utf-8">
+  <table class="tahoe-directory"><tr id="headers">
+      <th>Type</th>
+      <th>Filename</th>
+      <th>Size (bytes)</th>
+      <th>Time Uploaded</th>
+    </tr>
+      {{#items}}
+      <tr class="node">
+        <td>{{type}}</td>
+        <td><a href="{{fileurl}}">{{filename}}</a></td>
+        <td>{{size}}</td>
+        <td class="time">{{time}}</td>
+        <td class="epoch" style="display:none">{{epoch}}</td>
+      </tr>
+      {{/items}}
+  </table>
+</script>
+
+<script id="breadcrumbs" type="text/x-mustache" charset="utf-8">
+  {{#links}}
+    <a class="breadcrumb" href="{{backurl}}">{{backtext}} »</a>
+  {{/links}}
+  {{current}}
+</script>
+
+<script src="script/files.js"></script>
+
+<!--<script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/js/poll.js"></script>-->
+
+</body></html>

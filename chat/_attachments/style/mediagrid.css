@@ -1,7 +1,7 @@
 @font-face {
 font-family: mediagrid;
-src: url('/css/indie.otf'),
-     url('/css/indie.eot'); /* IE9 */
+src: url('indie.otf'),
+     url('indie.eot'); /* IE9 */
 font-weight:600;
 }
 
@@ -196,7 +196,7 @@ padding: 20px 0;
 -webkit-border-radius:15px;
 border-radius:15px;
 text-align:center;
-display:none;
+/*display:none;*/
 position:relative;
 }
 
@@ -204,7 +204,7 @@ position:relative;
 width:90%;
 }
 
-.newroom #okay, .newroom #name, .newroom #popupmsg, .register #okay, .register #name, .changename #popupmsg, .changename #name, .changename #okay, .changename #cancel, .joinroom #name, .joinroom #okay, .joinroom #cancel, .joinroom #popupmsg, .alert #popupmsg, .alert #okay {
+.keygen #popupmsg, .newroom #okay, .newroom #name, .newroom #popupmsg, .register #okay, .register #name, .changename #popupmsg, .changename #name, .changename #okay, .changename #cancel, .joinroom #name, .joinroom #okay, .joinroom #cancel, .joinroom #popupmsg, .alert #popupmsg, .alert #okay {
 display:inline;
 }
 
@@ -275,7 +275,7 @@ overflow:hidden;
 
 #inputbox {
 font-size:16px;
-width:502px;
+width:492px;
 border:none;
 padding:5px;
 float:left;
@@ -362,4 +362,12 @@ color:black;
 
 .myname {
   font-weight:bold;
+}
+
+form {
+  margin-bottom:1em;
+}
+
+button {
+  padding:0;
 }
