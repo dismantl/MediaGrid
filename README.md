@@ -47,7 +47,7 @@ Modify the `port` and `bind_address` options and add an admin user in the CouchD
     [admins]
     adminuser = s3cr3tp4ssw0rd
 
-replacing the above credentials with your own.
+replacing the above credentials with your own.  **Important: use unique, random passphrases for each and every node! This is because databases, and thus uploaded files, can be deleted remotely using admin credentials.**
     
 Now Restart the CouchDB server:
 
@@ -59,6 +59,9 @@ From the `mediagrid` directory, push the CouchApps onto the CouchDB server:
     couchapp push chat http://adminuser:s3cr3tp4ssw0rd@localhost/chat
 
 Finally, open up `http://localhost/media/_design/media/index.html` in your web browser to get started. Have fun!
+
+Replication (to be done)
+-------------
 
 More info
 -------------
