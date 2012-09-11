@@ -14,6 +14,9 @@ TODO:
 * custom Debian image for the RPi
 * native Android, iOS clients
 
+### \*Update\* 8/18/2012
+So I've kinda become enamored with CouchDB lately, and given the performance issues I've been having with Tahoe-LAFS, I may just re-write everything using CouchDB.  So stay tuned...
+
 Requirements
 ------------
 
@@ -41,3 +44,10 @@ For instructions on configuring Tahoe-LAFS, refer to their documentation: https:
 Once you have your Tahoe introducer node running, you can start the tahoe service on each node with `tahoe start`.
 
 Finally, in the mediagrid directory, start the front-end server by running `sudo twistd -y mediagrid.py`. Enjoy!
+
+More info
+-------------
+
+For questions or comments, send me an e-mail to dan.staples [at symbol] riseup [dot symbol] net.
+
+All donations to the project are appreciated, and will go towards purchasing hardware for testing and development. You can contribute via [Gittip](https://www.gittip.com/danstaples/) or [Flattr](https://flattr.com/profile/danstaples).
