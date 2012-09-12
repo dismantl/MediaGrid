@@ -73,16 +73,12 @@ $(function() {
 	};
 	db.saveDoc(doc, {
 		success: function() {
-			//alert('first');
 			$("[name='_rev']", form).val(doc._rev);
-			//alert(doc._rev);
 			var attachments = $("[name='_attachments']", form).val();
 			if (attachments) {
-				//alert('2');
 				$(form).ajaxSubmit({
 					url: db.uri + $.couch.encodeDocId(doc._id),
 					success: function() { 
-						//alert('3');
 						$("[name='_attachments']", form).val(''); 
 					}
 				});

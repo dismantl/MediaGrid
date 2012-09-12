@@ -1,6 +1,6 @@
 function(newDoc, oldDoc, userCtx) {
   if (userCtx.roles.indexOf("_admin") !== -1) {
-    return;
+    if (newDoc._id === "motd") return;
   }
   //required("type");
   if (newDoc.type === 'USER' || (oldDoc && oldDoc.type === 'USER')) {
