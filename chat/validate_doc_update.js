@@ -1,4 +1,5 @@
 function(newDoc, oldDoc, userCtx) {
+  log(newDoc);
   if (userCtx.roles.indexOf("_admin") !== -1) {
     if (newDoc._id === "motd") return;
   }
@@ -19,7 +20,7 @@ function(newDoc, oldDoc, userCtx) {
     if (!RegExp(/^[a-zA-Z0-9]{1,12}$/).test(newDoc.name)) {
       throw({forbidden: "invalid username"});
     }
-    if (newDoc.key && (newDoc.key !== 0) && !RegExp(/^[a-zA-Z0-9=_-]{43}$/).test(newDoc.key)) {
+    if (newDoc.key && (newDoc.key !== 0) && !RegExp(/^[a-zA-Z0-9=_-]{42,43}$/).test(newDoc.key)) {
       throw({forbidden: "invalid public key...sketchball."});
     }
     if (Object.prototype.toString.call(newDoc.rooms) != '[object Array]' || newDoc.rooms.length === 0) {
@@ -33,6 +34,7 @@ function(newDoc, oldDoc, userCtx) {
       required("message");
       required("created_at");
       required("room");
+      required("test");
       if (userCtx.name !== newDoc.nick) {
 	throw({unauthorized: "Impersonating other users is not allowed"});
       }
@@ -42,12 +44,39 @@ function(newDoc, oldDoc, userCtx) {
       if (!RegExp(/^[0-9]{13}$/).test(newDoc.created_at)) {
 	throw({forbidden: "invalid timestamp"});
       }
-      if (Object.prototype.toString.call(newDoc.message) == '[object Array]') {
+      if (Object.prototype.toString.call(newDoc.message) == '[object Object]') {
 	for (i in newDoc.message) {
 	  if (!RegExp(/^[a-zA-Z0-9\+=/]+$/).test(newDoc.message[i].msg) || !RegExp(/^[a-zA-Z0-9]{128}$/).test(newDoc.message[i].hmac)) {
 	    throw({forbidden: "invalid message"});
 	  }
 	}
+      }
+    }
+  } else if (newDoc.type === 'IM' || (oldDoc && oldDoc.type === 'IM')) {
+    if (oldDoc || newDoc._deleted) {
+      throw({forbidden: "You can't modify or delete chat messages"});
+    } else {
+      required("from");
+      required("to");
+      required("created_at");
+      required("message");
+      if (userCtx.name !== newDoc.from) {
+	throw({unauthorized: "Impersonating other users is not allowed"});
+      }
+      if (!RegExp(/^[a-zA-Z0-9]{1,12}$/).test(newDoc.from) || !RegExp(/^[a-zA-Z0-9]{1,12}$/).test(newDoc.to)) {
+	throw({forbidden: "invalid username"});
+      }
+      if (!RegExp(/^[0-9]{13}$/).test(newDoc.created_at)) {
+	throw({forbidden: "invalid timestamp"});
+      }
+      if (Object.prototype.toString.call(newDoc.message) == '[object Object]') {
+	for (i in newDoc.message) {
+	  if (!RegExp(/^[a-zA-Z0-9\+=/]+$/).test(newDoc.message[i].msg) || !RegExp(/^[a-zA-Z0-9]{128}$/).test(newDoc.message[i].hmac)) {
+	    throw({forbidden: "invalid message"});
+	  }
+	}
+      } else {
+	throw({forbidden: "invalid message"});
       }
     }
   } else {

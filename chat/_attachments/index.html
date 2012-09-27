@@ -3,6 +3,7 @@
 <head><title>Media Grid</title>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
 <link href="style/mediagrid.css" type="text/css" rel="stylesheet" />
+<link href="style/font-awesome.css" type="text/css" rel="stylesheet" />
   <script src="/_utils/script/sha1.js"></script>
   <script src="/_utils/script/json2.js"></script>
   <!--<script src="/_utils/script/jquery.js"></script>-->
@@ -15,7 +16,7 @@
 </head>
 <body id="mediagrid-chat">
 
-<h1><a href="/test/_design/test/index.html" id="header">MediaGrid</a></h1>
+<h1><a href="/media/_design/media/index.html" id="header">MediaGrid</a></h1>
 
 <div id="chat">
 
@@ -30,9 +31,16 @@
   </div>
 </div>
 
-<div id="messages"></div>
+<div id="window">
+  <div id="info"></div>
+  <div id="infobar"><i id="infobar-icon" class="icon-caret-up"></i></div>
+  <div id="messages" class="full"></div>
+</div>
 
-<div id="users"></div>
+<div id="sidebar">
+  <div id="room"></div>
+  <div id="users"></div>
+</div>
 
 <div id="userinput">
 <input type="text" name="inputbox" id="inputbox" autocomplete="off" maxlength="512">
@@ -53,7 +61,7 @@
 
 <script id="user" type="text/x-mustache" charset="utf-8">
   {{#users}}
-    <p class="{{class}}">{{nick}}</p>
+    <p class="user{{class}}" id="{{id}}"><i class="icon-user"></i> {{nick}}</p>
   {{/users}}
 </script>
 

@@ -3,10 +3,12 @@ $(function() {
 var shift = true,
   changesRunning = false,
   allSet = false,
+  pulse,
   username,
   password = "",
   tag = 0,
   queue = [],
+  msg_list = [],
   users = {},
   msg_map = {},
   lastmsg = 0,
@@ -20,8 +22,10 @@ var path = unescape(document.location.pathname).split('/'),
         design = path[3],
         db = $.couch.db(path[1]),
 	room = getParameterByName("room") || "default",
+	currentWin = {type: 'ROOM', name: room},
 	enc = (room === "default") ? false : true;
 
+$('#room').html('<p><i class="icon-comments"></i> ' + room + '</p>').addClass('current');	
 $.couch.session({
   success: function(resp) {
     if (resp.userCtx.name) {
@@ -29,7 +33,7 @@ $.couch.session({
       username = resp.userCtx.name;
       db.openDoc(username, {
 	success: function(user_doc) {
-	  if (enc && !user_doc.pubkey) {
+	  if (!user_doc.pubkey) {
 	    createUserDoc(username);
 	    return;
 	  }
@@ -53,7 +57,7 @@ $.couch.session({
       });
     } else {
       //need to register
-      $('#messages').css('width', '600px');
+      $('#window,#messages,#info').css('width', '600px');
       $('#users').hide();
       $('#fullscreen').show().addClass('register');
       $('#popup').fadeIn('slow', function () {
@@ -100,11 +104,11 @@ function register() {
 
 function createUserDoc(name) {
   name = name || username;
-  if (!enc) {
+  /*if (!enc) {
     console.log('no encryption, skipping key creation');
     sendUserDoc(name);
     return;
-  }
+  }*/
   //create personal keys		      
   $('#name, #okay').off();
   $('#fullscreen').fadeOut('fast', function () {
@@ -174,9 +178,9 @@ function sendUserDoc(name) {
     type: "USER",
     rooms: [room]
   };
-  if (enc) {
+  //if (enc) {
     user_doc.key = pubkey;
-  }
+  //}
   db.openDoc(name, {
     success: function(resp) {
       user_doc._rev = resp._rev;
@@ -203,7 +207,7 @@ function sendUserDoc(name) {
 	    });
 	    $('#inputbox').focus();
 	    $('#users').show(0);
-	    $('#messages').css('width', '500px');
+	    $('#window,#messages,#info').css('width', '500px');
 	    getStarted();
 	  },
 	  error: function() {
@@ -255,7 +259,7 @@ function getUsers() {
   db.view(design + "/users", {
     key: room,
     success: function(resp) {
-      var oldusers = jQuery.extend(true, {}, users); // deep copy the users object
+      var oldusers = $.extend(true, {}, users); // deep copy the users object
       var userlines = [];
       var names = [];
       $.each(resp.rows, function (i, user) {
@@ -264,10 +268,12 @@ function getUsers() {
 	if (!users[nick]) {
 	  users[nick] = {
 	    key: user.value.key,
-	    seckey: (enc) ? Whirlpool(ecDH(prikey, str2bigInt(user.value.key, 64))) : 0
+	    seckey: Whirlpool(ecDH(prikey, str2bigInt(user.value.key, 64))),
+	    messages: [],
+	    expanded: true
 	  };
 	}
-	if (enc) {
+	//if (enc) {
 	  var big = str2bigInt(users[nick].key, 64);
 	  if ((equals(big, p25519) || greater(big, p25519) || greater(z, big)) || 
 	  (users[nick].key !== user.value.key)) {
@@ -278,8 +284,13 @@ function getUsers() {
 	    users[nick].fingerprint = Whirlpool(nick + users[nick].key).substring(0, 22);
 	    users[nick].fingerprint = bubbleBabble(Crypto.util.hexToBytes(users[nick].fingerprint));
 	  }
-	}
-	user.value.class = (user.value.nick === username) ? user.value.nick + " myname" : user.value.nick;
+	//}
+	//user.value.class = (user.value.nick === username) ? user.value.nick + " myname" : user.value.nick;
+	user.value.class = '';
+	if (user.value.nick === username) user.value.class = " myname";
+	if (users[nick].newmsg) user.value.class = user.value.class + " newmsg";
+	if (currentWin.name === nick) user.value.class = user.value.class + " current";
+	user.value.id = user.value.nick;
 	userlines.push(user.value);
       });
       $.each(oldusers, function(olduser, val) {
@@ -293,14 +304,6 @@ function getUsers() {
       $("#users").html(them);
     }
   });
-}
-
-function setupChanges(since) {
-  if (!changesRunning) {
-    var changeHandler = db.changes(since);
-    changesRunning = true;
-    changeHandler.onChange(getMsg);
-  }
 }
 
 function msgDecrypt(sender, recv) {
@@ -320,6 +323,7 @@ function msgDecrypt(sender, recv) {
   return '';
 }
 
+/*
 function getMsg() {
   var startkey, endkey, viewname;
   if (enc) {
@@ -343,26 +347,30 @@ function getMsg() {
       if (shift) { resp.rows.shift(); }
       var getusers = false;
       $.each(resp.rows, function(i, val) {
-	if (enc) {
-	  if (msg_map[val.value.message[username].msg]) {
-	    val.value.message = msg_map[val.value.message[username].msg];
-	  } else {
-	    var cipher_text = val.value.message[username].msg;
-	    val.value.message = msgDecrypt(val.value.nick, val.value.message);
-	    msg_map[cipher_text] = val.value.message;
+	if (users[val.value.nick] && !users[val.value.nick].blockview) {
+	  if (Object.prototype.toString.call(val.value.message) == "[object Object]") {
+	    if (msg_map[val.value.message[username].msg]) {
+	      val.value.message = msg_map[val.value.message[username].msg];
+	    } else {
+	      var cipher_text = val.value.message[username].msg;
+	      val.value.message = msgDecrypt(val.value.nick, val.value.message);
+	      msg_map[cipher_text] = val.value.message;
+	    }
 	  }
-	}
-	if (val.value.message.match(/^\*\s[a-z]{1,12}\s(has arrived|has left)$/)) {
-	  getusers = true;
-	  val.value.nick = '';
-	  val.value.created_at = '';
-	} else if (val.value.message.match(/^\*\s[a-z]{1,12}\sis now known as$/)) {
-	  getusers = true;
-	  val.value.nick = '';
-	  val.value.created_at = '';
+	  if (val.value.message.match(/^\*\s[a-z0-9]{1,12}\s(has arrived|has left)$/)) {
+	    getusers = true;
+	    val.value.nick = '';
+	    val.value.created_at = '';
+	  } else if (val.value.message.match(/^\*\s[a-z0-9]{1,12}\sis now known as$/)) {
+	    getusers = true;
+	    val.value.nick = '';
+	    val.value.created_at = '';
+	  } else {
+	    //val.value.nick = '&lt;' + val.value.nick + '&gt;';
+	    val.value.created_at = new Date(val.value.created_at).toTimeString().substr(0, 8);
+	  }
 	} else {
-	  val.value.nick = '&lt;' + val.value.nick + '&gt;';
-	  val.value.created_at = new Date(val.value.created_at).toTimeString().substr(0, 8);
+	  val.value.nick = val.value.message = val.value.created_at = '';
 	}
       });
       if (getusers) getUsers();
@@ -372,6 +380,20 @@ function getMsg() {
 	items : data
       });
       $("#messages").html(them);
+      $(".line").each(function() {
+	if (match = $(this).html().match(/((mailto\:|(news|(ht|f)tp(s?))\:\/\/){1}[^<\s]+)/gi)) {
+		for (mc = 0; mc <= match.length - 1; mc++) {
+			var sanitize = match[mc].split('');
+			for (ii = 0; ii <= sanitize.length-1; ii++) {
+				if (!sanitize[ii].match(/\w|\d|\:|\/|\?|\=|\#|\+|\,|\.|\&|@|\;|\%/)) {
+					sanitize[ii] = encodeURIComponent(sanitize[ii]);
+				}
+			}
+			sanitize = sanitize.join('');
+			$(this).html($(this).html().replace(sanitize, '<a target="_blank" href="' + sanitize + '">' + match[mc] + '</a>'));
+		}
+	}
+      });
       $("#messages div.line:nth-child(odd)").addClass("line-odd");
       $('#messages').animate({
 	scrollTop: document.getElementById('messages').scrollHeight + 20
@@ -381,36 +403,232 @@ function getMsg() {
       setTimeout(getMsg,1000);
     }
   });
+}*/
+
+function getMsg() {
+  var startkey, endkey, viewname, update = false;
+  if (enc) {
+    viewname = "/privchat";
+    startkey = [room,username,lastmsg];
+    endkey = [room,username,"a"];
+  } else {
+    viewname = "/chatitems";
+    startkey = [room,lastmsg];
+    endkey = [room,"a"];
+  }
+  var old_msg_list = $.extend(true, [], msg_list); //deep copy msg_list
+  msg_list = [];
+  db.view(design + viewname, {
+    startkey: startkey,
+    endkey: endkey,
+    update_seq: true,
+    success: function(resp) {
+      setupChanges(resp.update_seq);
+      if (resp.rows.length === 1) {
+	shift = false;
+      }
+      if (shift) { resp.rows.shift(); }
+      var getusers = false;
+      $.each(resp.rows, function(i, val) {
+	if (!users[val.value.nick] || !users[val.value.nick].blockview) {
+	  if (Object.prototype.toString.call(val.value.message) == "[object Object]") {
+	    if (msg_map[val.value.message[username].msg]) {
+	      val.value.message = msg_map[val.value.message[username].msg];
+	    } else {
+	      var cipher_text = val.value.message[username].msg;
+	      val.value.message = msgDecrypt(val.value.nick, val.value.message);
+	      msg_map[cipher_text] = val.value.message;
+	    }
+	  }
+	  if (val.value.message.match(/^\*\s[a-z0-9]{1,12}\s(has arrived|has left)$/)) {	    
+	    getusers = true;
+	    val.value.nick = '';
+	    val.value.created_at = '';
+	  } else if (val.value.message.match(/^\*\s[a-z0-9]{1,12}\sis now known as$/)) {
+	    getusers = true;
+	    val.value.nick = '';
+	    val.value.created_at = '';
+	  } else {
+	    //val.value.nick = '&lt;' + val.value.nick + '&gt;';
+	    val.value.created_at = new Date(val.value.created_at).toTimeString().substr(0, 8);
+	  }
+	  if ($.inArray(val.value,old_msg_list) === -1) {
+	    update = true;
+	    console.log('found new msg');
+	    console.log(old_msg_list);
+	    console.log(val.value);
+	    console.log(old_msg_list[1]);
+	    console.log((old_msg_list[1] == val.value));
+	    if (old_msg_list[1]) console.log((old_msg_list[1].__proto__ == val.value.__proto__));
+	    if (old_msg_list[1]) console.log((old_msg_list[1].message == val.value.message));
+	    console.log($.inArray(val.value,old_msg_list));
+	  }
+	  msg_list.push(val.value);
+	}
+      });
+      if (getusers) getUsers();
+      if (update) {
+	if (currentWin.type === 'ROOM' && currentWin.name === room) {
+	  updateWin();
+	} else {
+	  newmsg = true;
+	  $('#room').addClass('newmsg');
+	  console.log('adding newclass to #room');
+	  pulse = setTimeout(function(){newmsg_pulse('room');},1000);
+	}
+      }
+    },
+    error: function() {
+      setTimeout(getMsg,1000);
+    }
+  });
 }
 
-function queueMsg(msg, encrypt, priority, async) {
+function updateWin() {
+  if (currentWin.type === 'IM') {
+    var messages = users[currentWin.name].messages;
+  } else {
+    var messages = msg_list;
+    messages.unshift({message: motd});
+  }
+  var them = $.mustache($("#message").html(), {
+	items : messages
+  });
+  $("#messages").html(them);
+  $(".line").each(function() {
+    if (match = $(this).html().match(/((mailto\:|(news|(ht|f)tp(s?))\:\/\/){1}[^<\s]+)/gi)) {
+	for (mc = 0; mc <= match.length - 1; mc++) {
+		var sanitize = match[mc].split('');
+		for (ii = 0; ii <= sanitize.length-1; ii++) {
+			if (!sanitize[ii].match(/\w|\d|\:|\/|\?|\=|\#|\+|\,|\.|\&|@|\;|\%/)) {
+				sanitize[ii] = encodeURIComponent(sanitize[ii]);
+			}
+		}
+		sanitize = sanitize.join('');
+		$(this).html($(this).html().replace(sanitize, '<a target="_blank" href="' + sanitize + '">' + match[mc] + '</a>'));
+	}
+    }
+  });
+  $("#messages div.line:nth-child(odd)").addClass("line-odd");
+  $('#messages').animate({
+    scrollTop: document.getElementById('messages').scrollHeight + 20
+  }, 600);
+}
+
+function newmsg_pulse(name) {
+  $('#' + name).toggleClass('newmsg');
+  pulse = setTimeout(function(){newmsg_pulse(name);},1000);
+}
+
+function getIM(latest) {
+  var newmsg_names = [];
+  $.each(latest.results, function(i, row) {
+    var name = (row.doc.from === username) ? row.doc.to : row.doc.from;
+    if (newmsg_names.indexOf(name) === -1) newmsg_names.push(name);
+  });
+  $.each(newmsg_names, function(i, name) {
+    users[name].messages = [];
+    if (users[name] && !users[name].blockview) {
+      getUserIM(name);
+    }
+  });
+  function getUserIM(name) {
+      db.view(design + "/im", {
+	startkey: [username,name,lastmsg],
+	endkey: [username,name,"a"],
+	update_seq: true,
+	success: function(resp) {
+	  setupChanges(resp.update_seq);
+	  $.each(resp.rows, function(i, row) {
+	    if (msg_map[row.value.message[username].msg]) {
+	      row.value.message = msg_map[row.value.message[username].msg];
+	    } else {
+	      var cipher_text = row.value.message[username].msg;
+	      row.value.message = msgDecrypt(row.value.from, row.value.message);
+	      msg_map[cipher_text] = row.value.message;
+	    }
+	    row.value.nick = row.value.from + ' &gt; ' + row.value.to;
+	    row.value.created_at = new Date(row.value.created_at).toTimeString().substr(0, 8);
+	    users[name].messages.push(row.value);
+	  });
+	  if (currentWin.type === 'IM' && currentWin.name === name) {
+	    updateWin();
+	  } else {
+	    users[name].newmsg = true;
+	    $('#' + name).addClass('newmsg');
+	    console.log('adding newmsg to #' + name);
+	    pulse = setTimeout(function(){newmsg_pulse(name);},1000);
+	  }
+	  /* when buddy name clicked, or if buddyname/room is current window: /////////////////////////////////////
+	  * 	de-alert buddyname
+	  * 	mustache and send to $("#messages").html(them)  [change this for getMsg too!]
+	  */
+	  
+	},
+	error: function() {
+	  setTimeout(function(){ getUserIM(name); },1000);
+	}
+      });  
+  }
+}
+
+function setupChanges(since) {
+  if (!changesRunning) {
+    var roomChangeHandler = db.changes(since, {filter: 'chat/chat', room: room});
+    var imChangeHandler = db.changes(since, {filter: 'chat/im', include_docs: true});
+    changesRunning = true;
+    roomChangeHandler.onChange(getMsg);
+    imChangeHandler.onChange(getIM);
+  }
+}
+
+function queueMsg(msg, encrypt, priority, async, im) {
   priority = priority || false;
   async = async || true;
   encrypt = (encrypt === undefined) ? enc : encrypt;
+  im = (im === undefined) ? ((currentWin.type === 'IM') ? true : false) : im;
   $('#inputbox').val('').focus();
   textcounter();
   if (msg !== '') {
-    if (encrypt) {
-      var plaintext = msg;
-      var msg = {};
-      $.each(users, function(name, user) {
-	var crypt = Crypto.AES.encrypt(plaintext,
-	  Crypto.util.hexToBytes(user.seckey.substring(0, 64)), {
-	    mode: new Crypto.mode.CBC(Crypto.pad.iso10126)
-	  });
-	msg[name] = {
-	  msg: crypt,
-	  hmac: Crypto.HMAC(Whirlpool, crypt, user.seckey.substring(64, 128))
-	};
-      });
+    var plaintext = msg;
+    msg = {};
+    if (encrypt || im) {
+      if (encrypt) {
+	var recipients = users;
+      } else {
+	var recipients = {}
+	recipients[currentWin.name] = users[currentWin.name];
+	recipients[username] = users[username];
+      }
+	$.each(recipients, function(name, user) {
+	  if (!user.blocksend) {
+	    var crypt = Crypto.AES.encrypt(plaintext,
+	      Crypto.util.hexToBytes(user.seckey.substring(0, 64)), {
+		mode: new Crypto.mode.CBC(Crypto.pad.iso10126)
+	      });
+	    msg[name] = {
+	      msg: crypt,
+	      hmac: Crypto.HMAC(Whirlpool, crypt, user.seckey.substring(64, 128))
+	    };
+	  }
+	});
     }
-    var doc = {
-      type: 'MSG',
-      room: room,
-      nick: username,
-      created_at: new Date().getTime(),
-      message: msg
-    };
+    if (im) {
+      var doc = {
+	type: 'IM',
+	from: username,
+	to: currentWin.name,
+	message: msg
+      };
+    } else {
+      var doc = {
+	type: 'MSG',
+	room: room,
+	nick: username,
+	//created_at: new Date().getTime(),
+	message: ($.isEmptyObject(msg)) ? plaintext : msg
+      };
+    }
     if (priority) {
       queue.unshift(doc);
     } else {
@@ -422,7 +640,14 @@ function queueMsg(msg, encrypt, priority, async) {
 
 function postMsg(async) {
   async = async || true;
-  db.saveDoc(queue[0], {
+  //db.saveDoc(queue[0], {
+  $.ajax({
+    url: 'http://' + document.location.host + '/' + path[1] + '/_design/' + design + '/_update/chatitem',
+    type: 'POST',
+    //contentType: "application/json",
+    //dataType: "json", 
+    data: JSON.stringify(queue[0]),
+    //data: queue[0],
     async: async,
     success: function() {
       queue.splice(0, 1);
@@ -441,14 +666,17 @@ window.onbeforeunload = logout;
 
 function logout() {
   if (allSet) {
-    queueMsg('* ' + username + ' has left',enc,true,false);
     db.openDoc(username, {
       success: function(user_doc) {
 	if (user_doc.rooms.length === 1) {
 	  db.removeDoc(user_doc, {async: false});
+	  queueMsg('* ' + username + ' has left',enc,true,false,false);
 	} else {
 	  user_doc.rooms.splice(user_doc.rooms.indexOf(room),1);
-	  db.saveDoc(user_doc, {async: false});
+	  db.saveDoc(user_doc, {async: false, success: function() {
+	    queueMsg('* ' + username + ' has left',enc,true,false,false);
+	    }
+	  });
 	}
       }
     }, {
@@ -533,6 +761,111 @@ function textcounter() {
 		$("#send").html(maxinput - $(field).val().length);
 	}
 }
+
+$('#infobar').click(function() {
+  if (!users[currentWin.name].expanded) {
+    $('#info').show(0);
+    $('#messages').attr('class','shrunk').scrollTop($('#messages').height());
+    $('#infobar-icon').attr('class','icon-caret-up');
+    users[currentWin.name].expanded = true;
+  } else {
+    $('#info').hide(0);
+    $('#messages').attr('class','expanded').scrollTop($('#messages').height());
+    $('#infobar-icon').attr('class','icon-caret-down');
+    users[currentWin.name].expanded = false;
+  }
+});
+
+$('#room').click(function() {
+  $('#inputbox').focus();
+  $('.user').removeClass('current');
+  $('#room').addClass('current').removeClass('newmsg');
+  console.log('removing newmsg from #room');
+  $('#info,#infobar').hide(0);
+  //$('#messages').css('height','437px');
+  $('#messages').attr('class','full');
+  currentWin = {type: 'ROOM', name: room};
+  updateWin();
+});
+  
+$('#users').on('click','.user',function() {
+  $('#inputbox').focus();
+  var user = $(this).attr('id');
+  users[user].newmsg = false;
+  $('.user,#room').removeClass('current');
+  $('#' + user).addClass('current').removeClass('newmsg');
+  clearTimeout(pulse);
+  console.log('removing newmsg from #' + user);
+  var info;
+  var viewuser = (users[user].blockview) ? 'no' : 'yes';
+  var senduser = (users[user].blocksend) ? 'no' : 'yes';
+  if (enc && username === user) {
+    //info = '<h2>' + user + '</h2><p>Users can send you a private message by typing:<br>@' + user + ' their message</p><br> \
+		      //<p>Verify your identity using your fingerprint:<br>' + users[user].fingerprint + '</p><br>';
+    info = '<h2>' + user + '</h2><p>Verify your identity using your fingerprint:<br>' + users[user].fingerprint + '</p><br>';
+  } else if (enc && username !== user) {
+    info = '<h2>' + user + '</h2> \
+		      <p>View messages by ' + user + ': <span id="viewuser">' + viewuser + '</span><br> \
+		      <p>Send messages to ' + user + ': <span id="senduser">' + senduser + '</span></p><br> \
+		      <p>Verify ' + user + '\'s identity using their fingerprint:<br>' + users[user].fingerprint + '</p><br>';
+  //} else if (!enc && username === user) {
+    //info = '<h2>' + user + '</h2><p>Users can send you a private message by typing:<br>@' + user + ' their message</p><br>';
+  } else {
+    info = '<h2>' + user + '</h2><p>View messages by ' + user + ': <span id="viewuser">' + viewuser + '</span></p><br>';
+  }
+  /*$('#popupmsg').html(info);
+  $('#fullscreen').addClass('userinfo').fadeIn('fast', function() {
+    $('#okay').click(function() {
+      $('#okay').off();
+      $('#fullscreen').fadeOut('fast', function() {
+	$(this).removeClass('userinfo');
+	$('#inputbox').focus();
+      });
+    });
+    $('#viewuser').click(function() {
+      users[user].blockview = (users[user].blockview) ? false : true;
+      viewuser = (users[user].blockview) ? 'no' : 'yes';
+      $('#viewuser').html(viewuser);
+      //alert(users[user].blockview);
+    });
+    if (enc) {
+      $('#senduser').click(function() {
+	users[user].blocksend = (users[user].blocksend) ? false : true;
+	senduser = (users[user].blocksend) ? 'no' : 'yes';
+	$('#senduser').html(senduser);
+	//alert(users[user].blocksend);
+      });
+    }
+  });*/
+  
+  $('#infobar').show(0);
+  //$('#messages').css('height','352px');
+  if (users[user].expanded){
+    $('#messages').attr('class','shrunk');
+    $('#infobar-icon').attr('class','icon-caret-up');
+    $('#info').html(info).show(0);
+  } else {
+    $('#messages').attr('class','expanded');
+    $('#infobar-icon').attr('class','icon-caret-down');
+    $('#info').hide(0);
+  }
+  currentWin = {type: 'IM', name: user};
+  updateWin();
+  $('#viewuser').click(function() {
+    users[user].blockview = (users[user].blockview) ? false : true;
+    viewuser = (users[user].blockview) ? 'no' : 'yes';
+    $('#viewuser').html(viewuser);
+    //alert(users[user].blockview);
+  });
+  if (enc) {
+    $('#senduser').click(function() {
+      users[user].blocksend = (users[user].blocksend) ? false : true;
+      senduser = (users[user].blocksend) ? 'no' : 'yes';
+      $('#senduser').html(senduser);
+      //alert(users[user].blocksend);
+    });
+  }
+});
 
 $('#joinroom').click(function () {
 	$('#menu').hide();
@@ -671,12 +1004,8 @@ function bubbleBabble(input) {
 
 
 //TODO:
-//user info dialog box
 //touchscreen slide for messagebox scrolling in mobile client (so no need for scrollbars)
-//block communication to chosen users
 //IM
 //send encrypted files
-//automatic links in messages
 //only update last 10 messages when getMsg()
-//use doc update handler to use server-size created_at timestamps, add pubkey when missing
 });

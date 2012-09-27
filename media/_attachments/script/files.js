@@ -68,16 +68,21 @@ $(function() {
 	e.preventDefault();
 	var form = this, doc = {
 	  type: 'FILE',
-	  dir: dir,
-	  created_at: new Date()
+	  //dir: dir,
+	  //created_at: new Date()
 	};
-	db.saveDoc(doc, {
-		success: function() {
-			$("[name='_rev']", form).val(doc._rev);
+	if (dir) form.dir = dir;
+	//db.saveDoc(doc, {
+	$.ajax({
+		url: 'http://' + document.location.host + '/' + path[1] + '/_design/' + design + '/_update/file',
+		type: 'POST',
+		data: doc,
+		success: function(doc_id, status, jqXHR) {
+			$("[name='_rev']", form).val(jqXHR.getResponseHeader('X-Couch-Update-NewRev'));
 			var attachments = $("[name='_attachments']", form).val();
 			if (attachments) {
 				$(form).ajaxSubmit({
-					url: db.uri + $.couch.encodeDocId(doc._id),
+					url: db.uri + $.couch.encodeDocId(doc_id),
 					success: function() { 
 						$("[name='_attachments']", form).val(''); 
 					}

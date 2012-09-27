@@ -23,6 +23,10 @@ font-family: mediagrid, Arial, Helvetica, sans-serif;
 font-variant:small-caps;
 }
 
+h2 {
+  margin-top:0;
+}
+
 table { 
   margin: 1em auto;
   border: .2em solid #aaaaaa; 
@@ -200,11 +204,11 @@ text-align:center;
 position:relative;
 }
 
-.newroom #popup, .newroom #name, .joinroom #popup, .joinroom #name {
+.newroom #popup, .newroom #name, .joinroom #popup, .joinroom #name, .userinfo #popup {
 width:90%;
 }
 
-.keygen #popupmsg, .newroom #okay, .newroom #name, .newroom #popupmsg, .register #okay, .register #name, .changename #popupmsg, .changename #name, .changename #okay, .changename #cancel, .joinroom #name, .joinroom #okay, .joinroom #cancel, .joinroom #popupmsg, .alert #popupmsg, .alert #okay {
+.keygen #popupmsg, .newroom #okay, .newroom #name, .newroom #popupmsg, .register #okay, .register #name, .changename #popupmsg, .changename #name, .changename #okay, .changename #cancel, .joinroom #name, .joinroom #okay, .joinroom #cancel, .joinroom #popupmsg, .alert #popupmsg, .alert #okay, .userinfo #popupmsg, .userinfo #okay {
 display:inline;
 }
 
@@ -249,27 +253,74 @@ border-top:5px solid #aaaaaa;
 height:28px;
 }
 
-#messages {
--moz-border-radius:5px 5px 0 0;
+#window {
+  float:left;
+    -moz-border-radius:5px 5px 0 0;
 -webkit-border-radius:5px 5px 0 0;
 border-radius:5px 5px 0 0;
-height:437px;
+background:#f4f4f4;
+}
+
+#info {
+  display:none;
+  height:75px;
+  /*border-bottom:5px solid #aaaaaa;*/
+  width:500px;
+  background:#f4f4f4;
+  -moz-border-radius:5px 5px 0 0;
+-webkit-border-radius:5px 5px 0 0;
+border-radius:5px 5px 0 0;
+}
+
+#infobar {
+  display:none;
+  width:500px;
+  background:#aaaaaa;
+  height:10px;
+  cursor:pointer;
+}
+
+.shrunk {
+  height:352px;
+}
+
+.expanded {
+  height:427px;
+}
+
+.full {
+  height:437px;
+}
+
+#messages {
 width:500px;
 background:#f4f4f4;
 overflow:auto;
-float:left;
 word-wrap:break-word;
+  -moz-border-radius:5px 5px 0 0;
+-webkit-border-radius:5px 5px 0 0;
+border-radius:5px 5px 0 0;
+}
+
+#sidebar, #room {
+  -moz-border-radius:0 5px 0 0;
+-webkit-border-radius:0 5px 0 0;
+border-radius:0 5px 0 0;
+}
+
+#room {
+  width:92px;
+}
+
+#room, #users {
+  float:left;
+  border-left:5px solid #aaaaaa;
 }
 
 #users {
--moz-border-radius:0 5px 0 0;
--webkit-border-radius:0 5px 0 0;
-border-radius:0 5px 0 0;
-border-left:5px solid #aaaaaa;
 width:95px;
 background:#ffffff;
 height:437px;
-float:left;
 overflow:hidden;
 }
 
@@ -370,4 +421,42 @@ form {
 
 button {
   padding:0;
+}
+
+.user, #room {
+  padding: 3px 0 3px 3px;
+  border-bottom:1px solid grey;
+  -moz-transition: background-color 1s linear 0s;
+  -webkit-transition: background-color 1s linear 0s;
+  -o-transition: background-color 1s linear 0s;
+}
+
+#room, .user, #viewuser, #senduser {
+  cursor: pointer;
+}
+
+.userinfo #popupmsg {
+  text-align:left;
+}
+
+.nick {
+  background:#000000;
+  color:#ffffff;
+}
+
+.newmsg {
+  background-color:#334455;
+}
+
+.current {
+  background:#aaaaaa;
+}
+
+#infobar-icon {
+  vertical-align:middle;
+  margin:0 auto;
+  width:1px;
+  display:block;
+  position:relative;
+  bottom:6px;
 }
