@@ -2,6 +2,7 @@
 <html>
 <head><title>Media Grid</title>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<link href="style/bootstrap.min.css" type="text/css" rel="stylesheet" />
 <link href="style/mediagrid.css" type="text/css" rel="stylesheet" />
 <link href="style/font-awesome.css" type="text/css" rel="stylesheet" />
   <script src="/_utils/script/sha1.js"></script>
@@ -13,6 +14,8 @@
   <script src="/_utils/script/jquery.form.js"></script>
   <script src="script/jquery.mustache.js"></script>
   <script src="script/build.js"></script>
+  <script src="script/bootstrap.min.js"></script>
+  <script src="script/bootstrapx-clickover.js"></script>
 </head>
 <body id="mediagrid-chat">
 
@@ -31,26 +34,26 @@
   </div>
 </div>
 
-<div id="window">
-  <div id="info"></div>
-  <div id="infobar"><i id="infobar-icon" class="icon-caret-up"></i></div>
-  <div id="messages" class="full"></div>
+
+<div class="tabbable tabs-right">
+  <ul class="nav nav-tabs" id="sidebar"></ul>
+  <div class="tab-content" id="content-container">
+    <div class="tab-pane active" id="room-content">
+      <div class="messages"></div>
+    </div>
+    <!--<div id="user-panes"></div>-->
+  </div>
 </div>
 
-<div id="sidebar">
-  <div id="room"></div>
-  <div id="users"></div>
-</div>
-
-<div id="userinput">
+<div id="userinput" class="input-append">
 <input type="text" name="inputbox" id="inputbox" autocomplete="off" maxlength="512">
-<button id="send" name="send" type="button">Send</button>
-<button id="options" type="button"></button>
-<div id="menu">
-  <ul>
-    <a id="joinroom" href="javascript:void(0);"><li>Create/join private room</li></a>
-    <a id="changename" href="javascript:void(0);"><li>Change username</li></a>
-    <a id="logout" href="javascript:void(0);"><li>Logout</li></a>
+<button id="send" class="btn" name="send" type="button">Send</button>
+<div class="btn-group dropup" id="options">
+  <button class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-cog"></i></button>
+  <ul class="dropdown-menu">
+    <li><a id="joinroom" href="javascript:void(0);">Create/join private room</a></li>
+    <!--<li><a id="changename" href="javascript:void(0);">Change username</a></li>-->
+    <li><a id="logout" href="javascript:void(0);">Logout</a></li>
   </ul>
 </div>
 </div>
@@ -59,17 +62,38 @@
 <script type="text/javascript" src="script/jquery-ui-1.8.21.custom.min.js"></script>
 <script type="text/javascript" src="script/chat.js"></script>
 
-<script id="user" type="text/x-mustache" charset="utf-8">
-  {{#users}}
-    <p class="user{{class}}" id="{{id}}"><i class="icon-user"></i> {{nick}}</p>
-  {{/users}}
+<!--<div id="window">
+  <div id="info"></div>
+  <div id="infobar"><i id="infobar-icon" class="icon-caret-up"></i></div>
+  <div id="messages" class="full"></div>
+</div>
+
+<div id="sidebar">
+  <div id="room"></div>
+  <div id="users"></div>
+</div>-->
+
+<script id="window" type="text/x-mustache" charset="utf-8">
+  <div class="tab-pane {{active}}" id="{{window_name}}-content">
+    <!--<div class="info"></div>
+    <div class="btn infobar"><i class="infobar-icon icon-caret-up"></i></div>-->
+    <div class="messages"></div>
+  </div>
+</script>
+
+<!--<p class="user {{class}}" id="{{id}}"><i class="icon-user"></i> {{nick}}</p>-->
+
+<script id="tabs" type="text/x-mustache" charset="utf-8">
+  {{#tabs}}
+    <li class="{{class}}" id="{{identifier}}"><a href="#{{identifier}}-content" data-toggle="tab"><i class="{{icon}}"></i> {{label}}{{#info}}<span> <i class="icon-info-sign"></i></span>{{/info}}</a></li>
+  {{/tabs}}
 </script>
 
 <script id="message" type="text/x-mustache" charset="utf-8">
       {{#items}}
       <div class='line'>
-	<span class='created_at'>{{created_at}}</span>
-	<span class='nick'>{{nick}}</span>
+	<span class="created_at"> {{created_at}}</span>
+	{{{nick}}}
 	<span class='message'>{{message}}</span>
       </div>
       {{/items}}

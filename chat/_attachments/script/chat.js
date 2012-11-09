@@ -4,6 +4,7 @@ var shift = true,
   changesRunning = false,
   allSet = false,
   pulse,
+  pulse_tabs = [],
   username,
   password = "",
   tag = 0,
@@ -13,6 +14,7 @@ var shift = true,
   msg_map = {},
   lastmsg = 0,
   motd,
+  newmsg = false,
   maxinput = 256,
   seed = Math.seedrandom(),
   z = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4096, 0],
@@ -25,7 +27,7 @@ var path = unescape(document.location.pathname).split('/'),
 	currentWin = {type: 'ROOM', name: room},
 	enc = (room === "default") ? false : true;
 
-$('#room').html('<p><i class="icon-comments"></i> ' + room + '</p>').addClass('current');	
+//$('#room').html('<p><i class="icon-comments"></i> ' + room + '</p>').addClass('current');	
 $.couch.session({
   success: function(resp) {
     if (resp.userCtx.name) {
@@ -206,8 +208,8 @@ function sendUserDoc(name) {
 	      $(this).removeClass('keygen');
 	    });
 	    $('#inputbox').focus();
-	    $('#users').show(0);
-	    $('#window,#messages,#info').css('width', '500px');
+	    //$('#users').show(0);
+	    //$('#window,#messages,#info').css('width', '500px');
 	    getStarted();
 	  },
 	  error: function() {
@@ -255,12 +257,17 @@ function getStarted() {
   }
 }
 
-function getUsers() {
+function getUsers(callback) {
   db.view(design + "/users", {
     key: room,
     success: function(resp) {
       var oldusers = $.extend(true, {}, users); // deep copy the users object
-      var userlines = [];
+      var userlines = [{
+	icon: "icon-comments",
+	identifier: "room",
+	label: room,
+	class: (currentWin.name === room) ? "active" : ""
+      }];
       var names = [];
       $.each(resp.rows, function (i, user) {
 	var nick = user.value.nick;
@@ -272,6 +279,10 @@ function getUsers() {
 	    messages: [],
 	    expanded: true
 	  };
+	  $('#content-container').append($.mustache($('#window').html(), {
+	    active: (currentWin.name === user.value.nick) ? "active" : "",
+	    window_name: user.value.nick
+	  }));  
 	}
 	//if (enc) {
 	  var big = str2bigInt(users[nick].key, 64);
@@ -286,22 +297,30 @@ function getUsers() {
 	  }
 	//}
 	//user.value.class = (user.value.nick === username) ? user.value.nick + " myname" : user.value.nick;
-	user.value.class = '';
-	if (user.value.nick === username) user.value.class = " myname";
+	user.value.class = 'user';
+	if (user.value.nick === username) {
+	  user.value.class = user.value.class + " myname";
+	  user.value.icon = "icon-heart";
+	} else {
+	  user.value.icon = "icon-user";
+	}
 	if (users[nick].newmsg) user.value.class = user.value.class + " newmsg";
-	if (currentWin.name === nick) user.value.class = user.value.class + " current";
-	user.value.id = user.value.nick;
+	if (currentWin.name === nick) user.value.class = user.value.class + " active";
+	user.value.identifier = user.value.label = user.value.nick;
+	user.value.info = true;
 	userlines.push(user.value);
       });
       $.each(oldusers, function(olduser, val) {
 	if (names.indexOf(olduser) === -1) {
 	  delete users[olduser];
+	  $('#' + olduser + '-content').remove();
 	}
       });
-      var them = $.mustache($("#user").html(), {
-	users: userlines
+      var them = $.mustache($("#tabs").html(), {
+	tabs: userlines
       });
-      $("#users").html(them);
+      $("#sidebar").html(them);
+      typeof callback == "function" && callback();
     }
   });
 }
@@ -435,46 +454,38 @@ function getMsg() {
 	    if (msg_map[val.value.message[username].msg]) {
 	      val.value.message = msg_map[val.value.message[username].msg];
 	    } else {
-	      var cipher_text = val.value.message[username].msg;
-	      val.value.message = msgDecrypt(val.value.nick, val.value.message);
-	      msg_map[cipher_text] = val.value.message;
+	      if (!users[val.value.nick]) {
+		getUsers(getMsg);
+		return;
+	      } else {
+		var cipher_text = val.value.message[username].msg;
+		val.value.message = msgDecrypt(val.value.nick, val.value.message);
+		msg_map[cipher_text] = val.value.message;
+	      }
 	    }
 	  }
-	  if (val.value.message.match(/^\*\s[a-z0-9]{1,12}\s(has arrived|has left)$/)) {	    
-	    getusers = true;
-	    val.value.nick = '';
-	    val.value.created_at = '';
-	  } else if (val.value.message.match(/^\*\s[a-z0-9]{1,12}\sis now known as$/)) {
+	  if (val.value.message.match(/^\*\s[a-z0-9]{1,12}\s(has arrived|has left)$/) || val.value.message.match(/^\*\s[a-z0-9]{1,12}\sis now known as$/)) {	    
 	    getusers = true;
 	    val.value.nick = '';
 	    val.value.created_at = '';
 	  } else {
-	    //val.value.nick = '&lt;' + val.value.nick + '&gt;';
-	    val.value.created_at = new Date(val.value.created_at).toTimeString().substr(0, 8);
+	    val.value.created_at = '[' + new Date(val.value.created_at).toTimeString().substr(0, 8) + ']';
+	    val.value.nick = (val.value.nick === username) ? "<span class='label label-info nick'> " + val.value.nick + ':</span>' : "<span class='label nick'> " + val.value.nick + ':</span>';
 	  }
 	  if ($.inArray(val.value,old_msg_list) === -1) {
 	    update = true;
-	    console.log('found new msg');
-	    console.log(old_msg_list);
-	    console.log(val.value);
-	    console.log(old_msg_list[1]);
-	    console.log((old_msg_list[1] == val.value));
-	    if (old_msg_list[1]) console.log((old_msg_list[1].__proto__ == val.value.__proto__));
-	    if (old_msg_list[1]) console.log((old_msg_list[1].message == val.value.message));
-	    console.log($.inArray(val.value,old_msg_list));
 	  }
 	  msg_list.push(val.value);
 	}
       });
       if (getusers) getUsers();
       if (update) {
-	if (currentWin.type === 'ROOM' && currentWin.name === room) {
-	  updateWin();
-	} else {
+	updateWin('room');
+	if (currentWin.type === 'IM' || currentWin.name !== room) {
 	  newmsg = true;
-	  $('#room').addClass('newmsg');
-	  console.log('adding newclass to #room');
-	  pulse = setTimeout(function(){newmsg_pulse('room');},1000);
+	  if (!pulse) {
+	    pulse = setTimeout(function(){newmsg_pulse();},1000);
+	  }
 	}
       }
     },
@@ -484,18 +495,25 @@ function getMsg() {
   });
 }
 
-function updateWin() {
-  if (currentWin.type === 'IM') {
+function updateWin(tab) {
+  /*if (currentWin.type === 'IM') {
     var messages = users[currentWin.name].messages;
   } else {
     var messages = msg_list;
     messages.unshift({message: motd});
+  }*/
+  if (tab === 'room') {
+    var messages = msg_list;
+    messages.unshift({message: motd});
+  } else {
+    var messages = users[tab].messages;
   }
   var them = $.mustache($("#message").html(), {
 	items : messages
   });
-  $("#messages").html(them);
-  $(".line").each(function() {
+  //$("#messages").html(them);
+  $('#' + tab + '-content .messages').html(them);
+  $('#' + tab + '-content .messages .line').each(function() {
     if (match = $(this).html().match(/((mailto\:|(news|(ht|f)tp(s?))\:\/\/){1}[^<\s]+)/gi)) {
 	for (mc = 0; mc <= match.length - 1; mc++) {
 		var sanitize = match[mc].split('');
@@ -509,15 +527,27 @@ function updateWin() {
 	}
     }
   });
-  $("#messages div.line:nth-child(odd)").addClass("line-odd");
-  $('#messages').animate({
-    scrollTop: document.getElementById('messages').scrollHeight + 20
-  }, 600);
+  $('#' + tab + '-content .messages div.line:nth-child(odd)').addClass("line-odd");
+  /*$('#' + tab + '-content .messages').animate({
+    scrollTop: $('#' + tab + '-content .messages').scrollHeight + 20
+  }, 600);*/
+  $('#' + tab + '-content .messages').scrollTop($('#' + tab + '-content .messages').height());
 }
 
-function newmsg_pulse(name) {
-  $('#' + name).toggleClass('newmsg');
-  pulse = setTimeout(function(){newmsg_pulse(name);},1000);
+function newmsg_pulse() {
+  var names = '', pulse_on = false;
+  //SYNC NEWMSG CLASS BEFORE TOGGLING, OR THEY MIGHT ALTERNATE PULSING!!!!!!!!!!!!!!!!!!!!!!!!!
+  $.each(users, function(user, info) {
+    if (info.newmsg) names = names + '#' + user + ',';
+    if ($('#' + user).hasClass('newmsg')) pulse_on = true;
+  });
+  if (newmsg) names = names + '#room,';
+  if ($('#room').hasClass('newmsg')) pulse_on = true;
+  //remove last character of names
+  names = names.substring(0,names.length - 1);
+  if (pulse_on) $(names).addClass('newmsg');
+  $(names).toggleClass('newmsg');
+  pulse = setTimeout(function(){newmsg_pulse();},1000);
 }
 
 function getIM(latest) {
@@ -547,17 +577,19 @@ function getIM(latest) {
 	      row.value.message = msgDecrypt(row.value.from, row.value.message);
 	      msg_map[cipher_text] = row.value.message;
 	    }
-	    row.value.nick = row.value.from + ' &gt; ' + row.value.to;
-	    row.value.created_at = new Date(row.value.created_at).toTimeString().substr(0, 8);
+	    row.value.nick = (row.value.from === username) ? "<span class='label label-info nick'>" + row.value.from + ' &gt; ' + row.value.to + ':</span>' : "<span class='label nick'>" + row.value.from + ' &gt; ' + row.value.to + ':</span>';
+	    row.value.created_at = '[' + new Date(row.value.created_at).toTimeString().substr(0, 8) + ']';
 	    users[name].messages.push(row.value);
 	  });
-	  if (currentWin.type === 'IM' && currentWin.name === name) {
-	    updateWin();
-	  } else {
+	  //if (currentWin.type === 'IM' && currentWin.name === name) {
+	    updateWin(name);
+	  //} else {
+	  if (currentWin.type === 'ROOM' || currentWin.name !== name) {
 	    users[name].newmsg = true;
-	    $('#' + name).addClass('newmsg');
-	    console.log('adding newmsg to #' + name);
-	    pulse = setTimeout(function(){newmsg_pulse(name);},1000);
+	    //$('#' + name).addClass('newmsg');
+	    if (!pulse) {
+	      pulse = setTimeout(function(){newmsg_pulse();},1000);
+	    }
 	  }
 	  /* when buddy name clicked, or if buddyname/room is current window: /////////////////////////////////////
 	  * 	de-alert buddyname
@@ -582,7 +614,7 @@ function setupChanges(since) {
   }
 }
 
-function queueMsg(msg, encrypt, priority, async, im) {
+function queueMsg(msg, encrypt, priority, async, im, callback) {
   priority = priority || false;
   async = async || true;
   encrypt = (encrypt === undefined) ? enc : encrypt;
@@ -634,11 +666,11 @@ function queueMsg(msg, encrypt, priority, async, im) {
     } else {
       queue.push(doc);
     }
-    postMsg(async);
+    postMsg(async, callback);
   }
 }
 
-function postMsg(async) {
+function postMsg(async, callback) {
   async = async || true;
   //db.saveDoc(queue[0], {
   $.ajax({
@@ -651,6 +683,7 @@ function postMsg(async) {
     async: async,
     success: function() {
       queue.splice(0, 1);
+      typeof callback == "function" && callback();
       if (queue[0]) {
 	postMsg();
       }
@@ -664,17 +697,17 @@ function postMsg(async) {
 window.onbeforeunload = logout;
 //$(window).unload(logout);  <-- chrome doesn't like this...
 
-function logout() {
+function logout(callback) {
   if (allSet) {
     db.openDoc(username, {
       success: function(user_doc) {
 	if (user_doc.rooms.length === 1) {
 	  db.removeDoc(user_doc, {async: false});
-	  queueMsg('* ' + username + ' has left',enc,true,false,false);
+	  queueMsg('* ' + username + ' has left',enc,true,false,false,callback);
 	} else {
 	  user_doc.rooms.splice(user_doc.rooms.indexOf(room),1);
 	  db.saveDoc(user_doc, {async: false, success: function() {
-	    queueMsg('* ' + username + ' has left',enc,true,false,false);
+	    queueMsg('* ' + username + ' has left',enc,true,false,false,callback);
 	    }
 	  });
 	}
@@ -687,8 +720,8 @@ function logout() {
 }
 
 function joinRoom() {
-	var tojoin = $('#name').val();
-	window.location = window.location.pathname + "?room=" + tojoin;
+	//var tojoin = $('#name').val();
+	logout(function() { window.location = window.location.pathname + "?room=" + $('#name').val(); });
 }
 
 /*function changeNick() {
@@ -734,7 +767,7 @@ function errorPopup(msg, type) {
 	});
 }
 
-$('#inputbox').keydown(function (e) {
+$('#inputbox').keyup(function (e) {
 	textcounter();
 	if (e.keyCode == 13) {
 		queueMsg($.trim($(this).val()));
@@ -762,115 +795,85 @@ function textcounter() {
 	}
 }
 
-$('#infobar').click(function() {
-  if (!users[currentWin.name].expanded) {
-    $('#info').show(0);
-    $('#messages').attr('class','shrunk').scrollTop($('#messages').height());
-    $('#infobar-icon').attr('class','icon-caret-up');
-    users[currentWin.name].expanded = true;
-  } else {
-    $('#info').hide(0);
-    $('#messages').attr('class','expanded').scrollTop($('#messages').height());
-    $('#infobar-icon').attr('class','icon-caret-down');
-    users[currentWin.name].expanded = false;
-  }
+$('#sidebar').on('click','#room', function() {
+  $('#inputbox').focus();
+  $('#room').css({
+    'transition': 'background-color 0s linear 0s',
+    '-moz-transition': 'background-color 0s linear 0s',
+    '-webkit-transition': 'background-color 0s linear 0s',
+    '-o-transition': 'background-color 0s linear 0s',
+    'background-color':'rgba(0,0,1,0)'}).removeClass('newmsg');
+    setTimeout(function(){$('#room').removeAttr('style');},1000);
+  //clearTimeout(pulse);
+  newmsg = false;
+  currentWin = {type: 'ROOM', name: room};
 });
 
-$('#room').click(function() {
-  $('#inputbox').focus();
-  $('.user').removeClass('current');
-  $('#room').addClass('current').removeClass('newmsg');
-  console.log('removing newmsg from #room');
-  $('#info,#infobar').hide(0);
-  //$('#messages').css('height','437px');
-  $('#messages').attr('class','full');
-  currentWin = {type: 'ROOM', name: room};
-  updateWin();
+$('#sidebar').on('hover','.icon-info-sign',function() {
+  $(this).clickover({
+    trigger: 'click',
+    title: function() {
+      return $(this).parents('.user').attr('id');
+    },
+    content: function() {
+      var user = $(this).parents('.user').attr('id');
+      var info;
+      var viewuser = (users[user].blockview) ? 'no' : 'yes';
+      var senduser = (users[user].blocksend) ? 'no' : 'yes';
+      var viewclass = (viewuser === 'yes') ? 'btn-success' : 'btn-danger';
+      var sendclass = (senduser === 'yes') ? 'btn-success' : 'btn-danger';
+      if (username === user) {
+	info = '<strong><p>Verify your identity using your fingerprint:<br><span class="fingerprint label label-info">' + users[user].fingerprint + '</span></p></strong>';
+      } else if (enc) {
+	info = '<strong><p>View messages by ' + user + ': <span class="btn ' + viewclass + ' viewuser">' + viewuser + '</span><br> \
+			  <p>Send messages to ' + user + ': <span class="btn ' + sendclass + ' senduser">' + senduser + '</span></p><br> \
+			  <p>Verify ' + user + '\'s identity using their fingerprint:<br><span class="fingerprint label label-info">' + users[user].fingerprint + '</span></p></strong>';
+      } else {
+	info = '<strong><p>View messages by ' + user + ': <span class="btn ' + viewclass + ' viewuser">' + viewuser + '</span></p></strong>';
+      }
+      return info;
+    }
+  });
 });
-  
-$('#users').on('click','.user',function() {
+
+$('#sidebar').on('click','.user',function() {
   $('#inputbox').focus();
   var user = $(this).attr('id');
   users[user].newmsg = false;
-  $('.user,#room').removeClass('current');
-  $('#' + user).addClass('current').removeClass('newmsg');
-  clearTimeout(pulse);
-  console.log('removing newmsg from #' + user);
-  var info;
-  var viewuser = (users[user].blockview) ? 'no' : 'yes';
-  var senduser = (users[user].blocksend) ? 'no' : 'yes';
-  if (enc && username === user) {
-    //info = '<h2>' + user + '</h2><p>Users can send you a private message by typing:<br>@' + user + ' their message</p><br> \
-		      //<p>Verify your identity using your fingerprint:<br>' + users[user].fingerprint + '</p><br>';
-    info = '<h2>' + user + '</h2><p>Verify your identity using your fingerprint:<br>' + users[user].fingerprint + '</p><br>';
-  } else if (enc && username !== user) {
-    info = '<h2>' + user + '</h2> \
-		      <p>View messages by ' + user + ': <span id="viewuser">' + viewuser + '</span><br> \
-		      <p>Send messages to ' + user + ': <span id="senduser">' + senduser + '</span></p><br> \
-		      <p>Verify ' + user + '\'s identity using their fingerprint:<br>' + users[user].fingerprint + '</p><br>';
-  //} else if (!enc && username === user) {
-    //info = '<h2>' + user + '</h2><p>Users can send you a private message by typing:<br>@' + user + ' their message</p><br>';
-  } else {
-    info = '<h2>' + user + '</h2><p>View messages by ' + user + ': <span id="viewuser">' + viewuser + '</span></p><br>';
-  }
-  /*$('#popupmsg').html(info);
-  $('#fullscreen').addClass('userinfo').fadeIn('fast', function() {
-    $('#okay').click(function() {
-      $('#okay').off();
-      $('#fullscreen').fadeOut('fast', function() {
-	$(this).removeClass('userinfo');
-	$('#inputbox').focus();
-      });
-    });
-    $('#viewuser').click(function() {
-      users[user].blockview = (users[user].blockview) ? false : true;
-      viewuser = (users[user].blockview) ? 'no' : 'yes';
-      $('#viewuser').html(viewuser);
-      //alert(users[user].blockview);
-    });
-    if (enc) {
-      $('#senduser').click(function() {
-	users[user].blocksend = (users[user].blocksend) ? false : true;
-	senduser = (users[user].blocksend) ? 'no' : 'yes';
-	$('#senduser').html(senduser);
-	//alert(users[user].blocksend);
-      });
-    }
-  });*/
-  
-  $('#infobar').show(0);
-  //$('#messages').css('height','352px');
-  if (users[user].expanded){
-    $('#messages').attr('class','shrunk');
-    $('#infobar-icon').attr('class','icon-caret-up');
-    $('#info').html(info).show(0);
-  } else {
-    $('#messages').attr('class','expanded');
-    $('#infobar-icon').attr('class','icon-caret-down');
-    $('#info').hide(0);
-  }
+  $('#' + user).css({
+    'transition': 'background-color 0s linear 0s',
+    '-moz-transition': 'background-color 0s linear 0s',
+    '-webkit-transition': 'background-color 0s linear 0s',
+    '-o-transition': 'background-color 0s linear 0s',
+    'background-color':'rgba(0,0,1,0)'}).removeClass('newmsg');
+    setTimeout(function(){$('#' + user).removeAttr('style');},1000);
+  //clearTimeout(pulse);
   currentWin = {type: 'IM', name: user};
-  updateWin();
-  $('#viewuser').click(function() {
+});
+
+$('body').on('click','.viewuser',function() {
+    var user = $(this).parents('.popover-content').siblings('.popover-title').html();
     users[user].blockview = (users[user].blockview) ? false : true;
-    viewuser = (users[user].blockview) ? 'no' : 'yes';
-    $('#viewuser').html(viewuser);
-    //alert(users[user].blockview);
-  });
-  if (enc) {
-    $('#senduser').click(function() {
+    var viewuser = (users[user].blockview) ? 'no' : 'yes';
+    $(this).html(viewuser).toggleClass('btn-success btn-danger');
+    getMsg();
+});
+
+$('body').on('click','.senduser',function() {
+      var user = $(this).parents('.popover-content').siblings('.popover-title').html();
       users[user].blocksend = (users[user].blocksend) ? false : true;
-      senduser = (users[user].blocksend) ? 'no' : 'yes';
-      $('#senduser').html(senduser);
-      //alert(users[user].blocksend);
-    });
-  }
+      var senduser = (users[user].blocksend) ? 'no' : 'yes';
+      $(this).html(senduser).toggleClass('btn-success btn-danger');
+});
+
+$('#logout, #header').click(function() {
+  logout(function() { window.location = '/media/_design/media/index.html'; });
 });
 
 $('#joinroom').click(function () {
 	$('#menu').hide();
 	$('#name').val('');
-	$('#popupmsg').html('Enter room ID to join:');
+	$('#popupmsg').html('Enter room name to join:');
 	$('#fullscreen').addClass('joinroom').fadeIn('fast', function () {
 		$('#name').focus().select().attr('maxLength', '100');
 	});
@@ -915,16 +918,16 @@ $('#joinroom').click(function () {
 	});
 });*/
 
-$('#options').click(function () {
+/*$('#options').click(function () {
 	$('#menu').css({
 		'right': 0,
 		'bottom': $('#options').height()
 	}).show('slide', {
 		direction: 'down'
 	}, 'fast');
-});
+});*/
 
-$('html').click(function (event) {
+/*$('html').click(function (event) {
 	if (!$(event.target).is('#options')) {
 		$('#menu').hide();
 	}
@@ -932,7 +935,7 @@ $('html').click(function (event) {
 
 $('#menu').click(function (event) {
 	event.stopPropagation();
-});
+});*/
 
 function getParameterByName(name) {
     var match = RegExp('[?&]' + name + '=([^&]*)')

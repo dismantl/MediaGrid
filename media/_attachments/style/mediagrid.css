@@ -14,7 +14,6 @@ h1 {
 font-family: mediagrid, Arial, Helvetica, sans-serif;
 font-size:60px;
 font-variant:small-caps;
-margin:0;
 text-align: center;
 }
 
@@ -23,9 +22,9 @@ font-family: mediagrid, Arial, Helvetica, sans-serif;
 font-variant:small-caps;
 }
 
-table { 
-  margin: 1em auto;
-  border: .2em solid #aaaaaa; 
+#content table.tahoe-directory { 
+  margin: 0 0 1em;
+  border: .2em solid #aaaaaa;
   border-spacing: 1px;
 }
 th { 
@@ -62,7 +61,7 @@ body.tahoe-directory-page {
   margin: 1em 0; /* zero margin so the table can be flush */
 }
 table.tahoe-directory {
-  margin-top:1.2em;
+  margin-top:0;
   color: black;
   background: white;
   width: 100%;
@@ -127,12 +126,24 @@ text-decoration:none;
 	background-color:#f6f6f6;
 }
 
-.breadcrumb {
-margin-right:0.5em;
+ul.breadcrumb {
+margin:0 1em;
+display:inline-block;
+padding:6px 12px;
+border-radius:4px 4px 0 0;
+}
+
+ul.breadcrumb a {
+  padding:0;
 }
 
 #header {
 color:#000000;
+text-decoration:none;
+}
+
+#content {
+  margin:0 1em;
 }
 
 #mediagrid-startpage {
@@ -157,10 +168,6 @@ margin:0;
 position:absolute;
 text-align:center;
 width:100%;
-}
-
-#path {
-position:absolute;
 }
 
 #message h4 {
@@ -371,3 +378,12 @@ form {
 button {
   padding:0;
 }
+
+#createdir, #upload {
+  margin-bottom:1em;
+}
+
+tr {
+  text-align:center;
+}
+
