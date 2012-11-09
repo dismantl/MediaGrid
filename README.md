@@ -4,7 +4,7 @@ MediaGrid
 MediaGrid is a **takedown-resistant, distributed wireless infrastructure** allowing citizens to **communicate and share real-time photo and video documentation** at public demonstrations, without the need for internet access. A MediaGrid uses a distributed database running on a wireless mesh network of small, battery-powered devices. Smartphones (or any wifi-enabled device) within range can then connect to the wifi network to upload files and securely chat. **ALL files uploaded to the grid are completely recoverable even if most of the devices are confiscated or taken offline**. See the design document for more details: https://github.com/danstaples/MediaGrid/blob/master/MediaGrid.Design.pdf?raw=true.
 
 Implemented:
-* Front-end web application for uploading, browsing, and viewing files
+* Web application for uploading, browsing, and viewing files
 * Webchat, including private encrypted chatrooms and encrypted IM*
 
 **\* NOTE: The security of encrypted chat has not been thoroughly tested. DO NOT rely on it to protect super-sensitive communications!**
