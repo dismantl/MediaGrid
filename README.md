@@ -5,7 +5,7 @@ MediaGrid is a **takedown-resistant, distributed wireless infrastructure** allow
 
 Implemented/under development:
 * Front-end web application for uploading, browsing, and viewing files
-* Webchat, including private encrypted chatrooms*
+* Webchat, including private encrypted chatrooms and encrypted IM*
 
 **\* NOTE: The security of encrypted chat has not been thoroughly tested. DO NOT rely on it to protect super-sensitive communications!**
 
