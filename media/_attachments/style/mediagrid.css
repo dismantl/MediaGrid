@@ -15,6 +15,7 @@ font-family: mediagrid, Arial, Helvetica, sans-serif;
 font-size:60px;
 font-variant:small-caps;
 text-align: center;
+margin:0;
 }
 
 h3 {
@@ -135,6 +136,11 @@ border-radius:4px 4px 0 0;
 
 ul.breadcrumb a {
   padding:0;
+}
+
+.tahoe-directory-page h1 {
+  margin-top:10px;
+  margin-bottom:10px;
 }
 
 #header {
