@@ -16,6 +16,9 @@ TODO:
 * custom Debian image for the RPi
 * native Android, iOS clients
 
+### \*Update\* 11/8/2012
+Committed overhauled codebase. Webchat is more polished, thanks to Twitter Bootstrap. I finally feel satisfied with the desktop client, and will now start working on mobile clients. Also, I just ordered a few Raspberry Pi's so I can start testing multi-node performance. Huzzah!
+
 ### \*Update\* 9/11/2012
 Today I released the second version of MediaGrid (v2.0?). I've completely gotten rid of my custom python webapp and Tahoe-LAFS as the distributed filesystem, due to performance issues. They have been replaced with CouchDB, a distributed, non-relational database server. Everything is way faster, and my server-side code is probably under 100 lines of javascript. ALSO, encrypted webchat is now included for private chatrooms, thanks to code taken from CryptoCat (https://project.crypto.cat).
 
