@@ -74,7 +74,7 @@ $(function() {
 	if (dir) form.dir = dir;
 	//db.saveDoc(doc, {
 	$.ajax({
-		url: 'http://' + document.location.host + '/' + path[1] + '/_design/' + design + '/_update/file',
+		url: '//' + document.location.host + '/' + path[1] + '/_design/' + design + '/_update/file',
 		type: 'POST',
 		data: doc,
 		success: function(doc_id, status, jqXHR) {

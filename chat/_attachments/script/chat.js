@@ -674,7 +674,7 @@ function postMsg(async, callback) {
   async = async || true;
   //db.saveDoc(queue[0], {
   $.ajax({
-    url: 'http://' + document.location.host + '/' + path[1] + '/_design/' + design + '/_update/chatitem',
+    url: '//' + document.location.host + '/' + path[1] + '/_design/' + design + '/_update/chatitem',
     type: 'POST',
     //contentType: "application/json",
     //dataType: "json", 
