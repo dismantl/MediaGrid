@@ -12,11 +12,9 @@ function(doc) {
     };
     val.message = {};
     val.message[doc.to] = doc.message[doc.to];
-    log(val);
     emit([doc.to,doc.from,doc.created_at],val);
     val2.message = {};
     val2.message[doc.from] = doc.message[doc.from];
-    log(val2);
     emit([doc.from,doc.to,doc.created_at],val2);
   }
 }

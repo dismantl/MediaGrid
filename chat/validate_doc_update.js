@@ -1,5 +1,4 @@
 function(newDoc, oldDoc, userCtx) {
-  log(newDoc);
   if (userCtx.roles.indexOf("_admin") !== -1) {
     if (newDoc._id === "motd") return;
   }
@@ -35,7 +34,7 @@ function(newDoc, oldDoc, userCtx) {
       required("created_at");
       required("room");
       required("test");
-      if (userCtx.name !== newDoc.nick) {
+      if ((userCtx.name !== newDoc.nick) && !user_is("_admin")) {
 	throw({unauthorized: "Impersonating other users is not allowed"});
       }
       if (!RegExp(/^[a-zA-Z0-9]{1,12}$/).test(newDoc.nick)) {
@@ -60,7 +59,7 @@ function(newDoc, oldDoc, userCtx) {
       required("to");
       required("created_at");
       required("message");
-      if (userCtx.name !== newDoc.from) {
+      if ((userCtx.name !== newDoc.from) && !user_is("_admin")) {
 	throw({unauthorized: "Impersonating other users is not allowed"});
       }
       if (!RegExp(/^[a-zA-Z0-9]{1,12}$/).test(newDoc.from) || !RegExp(/^[a-zA-Z0-9]{1,12}$/).test(newDoc.to)) {
@@ -91,5 +90,9 @@ function(newDoc, oldDoc, userCtx) {
   function unchanged(field) {
     if (oldDoc && toJSON(oldDoc[field]) != toJSON(newDoc[field]))
       throw({forbidden : "Field can't be changed: " + field});
+  }
+
+  function user_is(role) {
+    return userCtx.roles.indexOf(role) >= 0;
   }
 }
