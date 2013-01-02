@@ -31,10 +31,10 @@ So I've kinda become enamored with CouchDB lately, and given the performance iss
 Requirements
 ------------
 
-* CouchDB (http://couchdb.apache.org)
-* CouchApp (http://couchapp.org)
-* Python 2.x >= 2.5
-* OLSRd (http://www.olsr.org)
+* Raspberry Pi
+* SD Card (with enough space for file storage)
+* USB WiFi adapter
+* Power source (I'm working on a cheap, high capacity battery pack, but AC adapter will work for now)
 
 Installation (outdated, to be replaced with custom Debian image)
 ------------
@@ -67,9 +67,6 @@ From the `mediagrid` directory, push the CouchApps onto the CouchDB server:
     couchapp push chat http://adminuser:s3cr3tp4ssw0rd@localhost/chat
 
 Finally, open up `http://localhost/media/_design/media/index.html` in your web browser to get started. Have fun!
-
-Replication (to be done)
--------------
 
 More info
 -------------
