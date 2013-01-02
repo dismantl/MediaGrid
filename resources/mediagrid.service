@@ -1,0 +1,12 @@
+<?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+
+<service-group>
+  <name replace-wildcards="no">mediagrid</name>
+
+  <service>
+    <type>_mediagrid._tcp</type>
+    <domain-name>mediagrid.local</domain-name>
+    <port>443</port>
+  </service>
+</service-group>

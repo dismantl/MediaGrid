@@ -1,0 +1,128 @@
+#!/bin/sh
+
+COUCH_USER=couchdb
+#COUCH_PASS=`od -An -N15 -tx1 /dev/urandom |sed -e "s/\s//g"`
+COUCH_PASS=couchdb
+
+PATH=$PATH:/usr/local/bin:/usr/local/sbin
+
+# raspi-config, expand root fs
+do_expand_rootfs() {
+  # Get the starting offset of the root partition
+  PART_START=$(parted /dev/mmcblk0 -ms unit s p | grep "^2" | cut -f 2 -d:)
+  [ "$PART_START" ] || return 1
+  # Return value will likely be error for fdisk as it fails to reload the 
+  # partition table because the root fs is mounted
+  fdisk /dev/mmcblk0 <<EOF
+p
+d
+2
+n
+p
+2
+$PART_START
+
+p
+w
+EOF
+  ASK_TO_REBOOT=1
+
+  # now set up an init.d script
+cat <<\EOF > /etc/init.d/resize2fs_once &&
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          resize2fs_once
+# Required-Start:
+# Required-Stop:
+# Default-Start: 2 3 4 5 S
+# Default-Stop:
+# Short-Description: Resize the root filesystem to fill partition
+# Description:
+### END INIT INFO
+
+. /lib/lsb/init-functions
+
+case "$1" in
+  start)
+    log_daemon_msg "Starting resize2fs_once" &&
+    resize2fs /dev/mmcblk0p2 &&
+    rm /etc/init.d/resize2fs_once &&
+    update-rc.d resize2fs_once remove &&
+    log_end_msg $?
+    ;;
+  *)
+    echo "Usage: $0 start" >&2
+    exit 3
+    ;;
+esac
+EOF
+  chmod +x /etc/init.d/resize2fs_once &&
+  update-rc.d resize2fs_once defaults
+}
+
+FLAG="/var/log/firstboot.log"
+if [ ! -e $FLAG ]; then
+
+UUID=`ip link show eth0 |tail -1 |awk '{ print $2 }' | awk -F ':' '{ printf("%03d%03d%03d","0x"$4,"0x"$5,"0x"$6) }'`
+hostname="mediagrid-$UUID"
+#echo "$hostname" > /proc/sys/kernel/hostname
+echo "$hostname" > /etc/hostname
+sed -i -e s/raspberrypi/$hostname/g /etc/hosts
+echo "$UUID" > $FLAG
+
+do_expand_rootfs
+
+############# SET IP ADDRESS BASED ON MAC ADDRESS
+ipaddr=5.`ip link show eth0 |tail -1 |awk '{ print $2 }' | awk -F ':' '{ printf("%d.%d.%d","0x"$4,"0x"$5,"0x"$6) }'`
+echo "$ipaddr" > /home/pi/ipaddr
+#######################################################
+
+telinit 6  # reboot
+
+else
+
+#install packages
+INSTALL=/home/pi/packages
+dpkg -i $INSTALL/*.deb
+pip install --find-links=file://$INSTALL/pip --no-index --index-url=file:///dev/null couchapp restkit watchdog http-parser socketpool nose webob PyYAML argh pathtools
+
+rm -r $INSTALL
+
+echo "$COUCH_USER = $COUCH_PASS" >> /etc/couchdb/local.ini
+sed -i -e "s/timeout = 600/timeout = 31557600/g" /etc/couchdb/default.ini
+service couchdb restart
+
+NGINX=/usr/local/nginx/conf
+if [ ! -e $NGINX/mediagrid.key -o ! -e $NGINX/mediagrid.crt ]; then
+mkdir -p $NGINX
+openssl genrsa -out $NGINX/mediagrid.key 2048
+openssl req -new -key $NGINX/mediagrid.key -out $NGINX/mediagrid.csr <<EOF
+
+
+
+
+
+
+
+
+
+EOF
+openssl x509 -req -days 365 -in $NGINX/mediagrid.csr -signkey $NGINX/mediagrid.key -out $NGINX/mediagrid.crt
+fi
+
+rm /etc/nginx/sites-enabled/default
+
+service nginx restart
+
+couchapp push /home/pi/MediaGrid/media http://"$COUCH_USER":"$COUCH_PASS"@localhost:5984/media
+couchapp push /home/pi/MediaGrid/chat http://"$COUCH_USER":"$COUCH_PASS"@localhost:5984/chat
+
+crontab -u pi /home/pi/.crontab
+
+# rm -r /home/pi/MediaGrid
+
+rm -f $0
+
+fi
+
+exit 0

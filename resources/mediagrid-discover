@@ -1,0 +1,74 @@
+#!/bin/bash
+
+COUCH_USER=couchdb
+COUCH_PASS=couchdb
+
+# abort if avahi-daemon not running
+if [ -z "$(pgrep avahi-daemon)" ]; then
+	exit 1
+fi
+
+IFS=$'='
+for service in `avahi-browse -kpacrd mediagrid.local`; do
+	# some extra string parsing
+	if [ ${service:0:1} == '+' ]; then
+		continue
+	fi
+	service=${service:0:(`expr length $service`-1)}
+
+	#parse $service
+	#format:
+	#	=;<interface>;<protocol>;<hostname long>;<type>;<domain>;<hostname.domain>;<ip addr>;<port>;<txt record>
+	#	1;     2     ;    3     ;        4      ;   5  ;   6    ;        7        ;    8    ;  9   ;      10
+	txt=`echo $service | cut -d ';' -f10-`
+
+	# make sure service type is 'mediagrid'
+	type=`echo $service |awk -F ';' '{print $5}' |grep -o "[^_.]*" |head -1`
+	if [ $type != "mediagrid" ]; then
+		continue
+	fi
+
+        # skip if no txt-record, if checking signature is necessary
+        #if [ -z "$txt" ]; then
+        #        continue
+        #fi
+
+	# check signature
+	######################################
+
+	# if signature validation failed, go to next advertisement
+	if [ $? -ne 0 ]; then
+		continue
+	fi
+
+	myip=`ip addr show wlan0 |tail -1 |awk '{ print $2 }' |cut -d '/' -f 1` # local ip address
+        remote=`echo $service | awk -F ';' '{print $8}'` # ip address of advertising node
+
+	# skip our own advertisements
+	if [ "$myip" == "$remote" ]; then
+		continue
+	fi
+
+	# if node already in list of known nodes, go to next advertisement
+	IFS=$' \t\n'
+	touch /home/pi/nodes
+	for node in $(cat /home/pi/nodes); do
+		if [ "$node" == "$remote" ]; then
+			match=true
+		fi
+	done
+	if [ $match ]; then
+		continue
+	fi
+
+	# add node ip address to list of known nodes
+	echo "$remote" >> /home/pi/nodes
+
+	# add continuous bi-directional replication entries for advertising node
+	curl -X POST http://"$COUCH_USER":"$COUCH_PASS"@localhost:5984/_replicator -d "{\"source\": \"chat\", \"target\":\"https://$COUCH_USER:$COUCH_PASS@$remote/chat\", \"continuous\":true, \"user_ctx\":{\"name\":\"$COUCH_USER\",\"roles\":[\"_admin\"]}}" -H "Content-Type: application/json"
+	curl -X POST http://"$COUCH_USER":"$COUCH_PASS"@localhost:5984/_replicator -d "{\"target\": \"chat\", \"source\":\"https://$remote/chat\", \"continuous\":true, \"user_ctx\":{\"name\":\"$COUCH_USER\",\"roles\":[\"_admin\"]}}" -H "Content-Type: application/json"
+	curl -X POST http://"$COUCH_USER":"$COUCH_PASS"@localhost:5984/_replicator -d "{\"source\": \"media\", \"target\":\"https://$COUCH_USER:$COUCH_PASS@$remote/media\", \"continuous\":true, \"user_ctx\":{\"name\":\"$COUCH_USER\",\"roles\":[\"_admin\"]}}" -H "Content-Type: application/json"
+	curl -X POST http://"$COUCH_USER":"$COUCH_PASS"@localhost:5984/_replicator -d "{\"target\": \"media\", \"source\":\"https://$remote/media\", \"continuous\":true, \"user_ctx\":{\"name\":\"$COUCH_USER\",\"roles\":[\"_admin\"]}}" -H "Content-Type: application/json"
+done
+
+exit
