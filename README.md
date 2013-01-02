@@ -15,6 +15,7 @@ TODO:
 * OLSRd configuration
 * documentation
 * native Android, iOS clients
+* Serval integration for signing files and wireless traffic (https://github.com/servalproject/)
 
 ### \*Update\* 1/1/2013
 Happy New Year! I've just finished creating a custom, zero-configuration Debian image for the Raspberry Pi. Basically, you just put the image onto an SD card, insert it into the Raspberry Pi, turn it on, and it will automagically configure everything and join with any other MediaGrid nodes it finds nearby. Some of the networking configuration still needs to be tweaked, but once I get that done I will update the source code, release the image, and create an updated design document. After that, I plan on doing performance benchmarking and optimization to get everything ready for some real field testing. Huzzah!
