@@ -1,20 +1,23 @@
 MediaGrid
 =========
 
-MediaGrid is a **takedown-resistant, distributed wireless infrastructure** allowing citizens to **communicate and share real-time photo and video documentation** at public demonstrations, without the need for internet access. A MediaGrid uses a distributed database running on a wireless mesh network of small, battery-powered devices. Smartphones (or any wifi-enabled device) within range can then connect to the wifi network to upload files and securely chat. **ALL files uploaded to the grid are completely recoverable even if most of the devices are confiscated or taken offline**. See the design document for more details: https://github.com/danstaples/MediaGrid/blob/master/MediaGrid.Design.pdf?raw=true.
+MediaGrid is a **takedown-resistant, distributed wireless infrastructure** allowing citizens to **communicate and share real-time photo and video documentation** at public demonstrations, without the need for internet access. A MediaGrid uses a distributed database running on a wireless mesh network of small, battery-powered devices. Smartphones (or any wifi-enabled device) within range can then connect to the wifi network to upload files and securely chat. **ALL files uploaded to the grid are completely recoverable even if most of the devices are confiscated or taken offline**. See the original (outdated) design document for more details: https://github.com/danstaples/MediaGrid/blob/master/MediaGrid.Design.pdf?raw=true.
 
 Implemented:
 * Web application for uploading, browsing, and viewing files
 * Webchat, including private encrypted chatrooms and encrypted IM*
+* Automated discovery of, and replication with, other MediaGrid nodes using mDNS/DNSSD
+* Custom, zero-configuration Debian image for the Raspberry Pi
 
 **\* NOTE: The security of encrypted chat has not been thoroughly tested. DO NOT rely on it to protect super-sensitive communications!**
 
 TODO:
 * OLSRd configuration
 * documentation
-* installation/configuration scripts
-* custom Debian image for the RPi
 * native Android, iOS clients
+
+### \*Update\* 1/1/2013
+Happy New Year! I've just finished creating a custom, zero-configuration Debian image for the Raspberry Pi. Basically, you just put the image onto an SD card, insert it into the Raspberry Pi, turn it on, and it will automagically configure everything and join with any other MediaGrid nodes it finds nearby. Some of the networking configuration still needs to be tweaked, but once I get that done I will update the source code, release the image, and create an updated design document. After that, I plan on doing performance benchmarking and optimization to get everything ready for some real field testing. Huzzah!
 
 ### \*Update\* 11/8/2012
 Committed overhauled codebase. Webchat is more polished, thanks to Twitter Bootstrap. I finally feel satisfied with the desktop client, and will now start working on mobile clients. Also, I just ordered a few Raspberry Pi's so I can start testing multi-node performance. Huzzah!
