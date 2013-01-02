@@ -36,7 +36,7 @@ Requirements
 * Python 2.x >= 2.5
 * OLSRd (http://www.olsr.org)
 
-Installation
+Installation (outdated, to be replaced with custom Debian image)
 ------------
 
 This section describes the procedure for installing the CouchDB server. I recommend using an SD card preloaded with Debian Wheezy. Images and instructions for preparing the SD card can be found on the Raspberry Pi website: http://www.raspberrypi.org/downloads.
