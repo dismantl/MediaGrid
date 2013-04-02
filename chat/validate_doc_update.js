@@ -33,7 +33,6 @@ function(newDoc, oldDoc, userCtx) {
       required("message");
       required("created_at");
       required("room");
-      required("test");
       if ((userCtx.name !== newDoc.nick) && !user_is("_admin")) {
 	throw({unauthorized: "Impersonating other users is not allowed"});
       }
