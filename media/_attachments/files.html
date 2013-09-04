@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" ng-app="mgFiles">
 <head><title>Media Grid</title>
 <link href="style/bootstrap.min.css" type="text/css" rel="stylesheet" />
 <link href="style/mediagrid.css" type="text/css" rel="stylesheet" />
@@ -9,94 +9,75 @@
   <script src="/_utils/script/jquery.js"></script>
   <script src="/_utils/script/jquery.couch.js"></script>
   <script src="/_utils/script/jquery.form.js"></script>
-  <script src="script/jquery.mustache.js"></script>
-  <!--<script src="script/bootstrap.min.js"></script>-->
+  <script src="lib/angular.js"></script>
+  <script src="script/app.js"></script>
+  <script src="script/services.js"></script>
 </head>
-<body class="tahoe-directory-page">
+<body class="tahoe-directory-page" ng-controller="mgFileCtrl">
 
-<h1><a id="header" href="index.html">MediaGrid</a></h1>
+  <h1><a id="header" href="index.html">MediaGrid</a></h1>
 
-<div id="path"></div>
+  <div id="path" ng-show="current">
+    <ul class="breadcrumb">
+      <li ng-repeat="link in links"><a class="breadcrumb" ng-href="{{document.location.pathname + '?dir=' + link.path}}">{{link.text}}</a> » </li>
+      <li class="active">{{current}}</li>
+    </ul>
+  </div>
 
-<div id="content"></div>
-
-<div class="tahoe-directory-footer">
-<!--<form id="createdir" class="form-horizontal">-->
-<div class="navbar">
-<div class="navbar-inner">
-<form id="createdir" class="navbar-form pull-left form-inline">
-  <!--<fieldset>-->
-    <h4>Create a new directory in this directory</h4>
-    <!--<div class="control-group">-->
-      <label class="control-label" for="dir_name">New directory name: </label>
-      <!--<div class="controls">-->
-	<div class="input-append">
-	  <input type="text" name="name" id="dir_name" placeholder="Directory Name" />
-	  <button class="btn btn-primary" type="submit">Create</button>
-	</div>
-      <!--</div>
-    </div>
-  </fieldset>-->
-</form>
-</div>
-</div>
-
-<div class="navbar">
-<div class="navbar-inner">
-<form id="upload" class="navbar-form pull-left">
-
-    <h4>Upload a file to this directory:</h4>
-    <div class="controls">
-      <input type="file" id="file" name="_attachments" />
-      <input type="hidden" name="_rev" value="" />
-      <button class="btn btn-primary" type="submit">Upload</button>
-    </div>
-</form>
-</div>
-</div>
-
-<div class="well" id="logos">
-  <h3>Powered by:</h3>
-  <!--<a href="https://tahoe-lafs.org/" target="_blank"><img src="style/images/tahoe_small.png" /></a>-->
-  <a href="https://couchdb.org/" target="_blank"><img src="style/images/couchdb.png" /></a>
-  <a href="http://www.olsr.org/" target="_blank"><img src="style/images/olsr_small.jpg" /></a>
-  <a href="http://www.debian.org/" target="_blank"><img src="style/images/debian_small.png" /></a>
-  <a href="http://www.raspberrypi.org/" target="_blank"><img src="style/images/raspberry_pi_small.png" /></a>
-</div>
-
-</div>
-
-<script id="files" type="text/x-mustache" charset="utf-8">
-  <table class="tahoe-directory"><tr id="headers">
-      <th>Type</th>
-      <th>Filename</th>
-      <th>Size (bytes)</th>
-      <th>Time Uploaded</th>
-    </tr>
-      {{#items}}
-      <tr class="node">
-        <td>{{type}}</td>
-        <td><a href="{{fileurl}}">{{filename}}</a></td>
-        <td>{{size}}</td>
-        <td class="time">{{time}}</td>
-        <td class="epoch" style="display:none">{{epoch}}</td>
+  <div id="content">
+    <table class="tahoe-directory">
+      <tr id="headers">
+        <th>Type</th>
+        <th>Filename</th>
+        <th>Size (bytes)</th>
+        <th>Time Uploaded</th>
       </tr>
-      {{/items}}
-  </table>
-</script>
+      <tr ng-repeat="item in items | orderBy:'time'" class="node">
+        <td>{{item.type}}</td>
+        <td><a ng-href="{{item.fileurl}}">{{item.filename}}</a></td>
+        <td>{{item.size}}</td>
+        <td class="time">{{item.time | date:'medium'}}</td>
+      </tr>
+    </table>
+  </div>
 
-<script id="breadcrumbs" type="text/x-mustache" charset="utf-8">
-<ul class="breadcrumb">
-  {{#links}}
-    <li><a class="breadcrumb" href="{{backurl}}">{{backtext}}</a> » </li>
-  {{/links}}
-  <li class="active">{{current}}</li>
-</ul>
-</script>
+  <div class="tahoe-directory-footer">
 
-<script src="script/files.js"></script>
+    <div class="navbar">
+      <div class="navbar-inner">
+        <form novalidate name="createdir" id="createdir" class="navbar-form pull-left form-inline">
+        <h4>Create a new directory in this directory</h4>
+        <label class="control-label" for="dir_name">New directory name: </label>
+        <div class="input-append">
+          <input type="text" name="dir_name" id="dir_name" ng-model="newdir" placeholder="Directory Name" required />
+          <button ng-click="makeDir()" ng-disabled="createdir.$invalid" class="btn btn-primary">Create</button>
+        </div>
+        </form>
+      </div>
+    </div>
 
-<!--<script type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
-<script type="text/javascript" src="/js/poll.js"></script>-->
+    <div class="navbar">
+      <div class="navbar-inner">
+        <form name="upload" id="upload" class="navbar-form pull-left">
+          <h4>Upload a file to this directory:</h4>
+          <div class="controls">
+            <input type="file" id="file" ng-model="_attachments" name="_attachments" />
+            <input type="hidden" name="_rev" ng-model="_rev" value="" />
+            <button ng-click="uploadFile()" ng-disabled="upload.$invalid" class="btn btn-primary">Upload</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
-</body></html>
+    <div class="well" id="logos">
+      <h3>Powered by:</h3>
+      <a href="https://couchdb.org/" target="_blank"><img src="style/images/couchdb.png" /></a>
+      <a href="http://www.olsr.org/" target="_blank"><img src="style/images/olsr_small.jpg" /></a>
+      <a href="http://www.debian.org/" target="_blank"><img src="style/images/debian_small.png" /></a>
+      <a href="http://www.raspberrypi.org/" target="_blank"><img src="style/images/raspberry_pi_small.png" /></a>
+    </div>
+
+  </div>
+
+</body>
+</html>
