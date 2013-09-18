@@ -408,8 +408,7 @@
          * $changes.stop();
          * </code></pre>
          */
-        changes: function(since, options) {
-
+        changes: function(since, options, initialize) {
           options = options || {};
           // set up the promise object within a closure for this handler
           var timeout = 100, db = this, active = true,
@@ -468,7 +467,7 @@
             );
           }
           // start the first request
-          if (since) {
+          if (!initialize) {
             getChangesSince();
           } else {
             db.info({

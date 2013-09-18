@@ -1,0 +1,71 @@
+<div id="mediagrid-chat" ng-controller="mgChat.userCtrl">
+
+<script type="text/ng-template" id="popupTemplate">
+<div class="modal-header" ng-hide="noHeader"><h3 ng-bind="header"></h3></div>
+<div class="modal-body">
+  <div id="popupMsg" ng-bind="msg" ng-show="msg"></div>
+  <form name="popupForm" ng-submit="onOk()">
+    <div class="control-group" ng-class="{error: popupForm.$invalid}">
+      <input type="text" ng-hide="noInput" ng-model="input.txt" placeholder="{{placeholder}}"
+         name="popupInput" autocomplete="off" id="popupInput" ng-focus="!noInput"
+         required maxlength="{{input.maxlength}}" ng-pattern="/^[a-zA-Z0-9]+$/" />
+      <span ng-show="popupForm.popupInput.$error.required && !popupForm.$pristine" class="help-inline">{{requiredMsg}}</span>
+      <span ng-show="popupForm.popupInput.$error.pattern" class="help-inline">Alphanumeric characters only</span>
+      <!--<span ng-show="popupForm.popupInput.$error.maxlength" class="help-inline">{{input.maxlength}} characters max</span>-->
+    </div>
+    <div class="modal-footer" ng-hide="buttons.noButtons">
+      <button class="btn btn-primary" type="submit" ng-show="buttons.ok" ng-disabled="popupForm.$invalid">Okay</button>
+      <button class="btn btn-info" ng-click="reset()" ng-show="buttons.reset">Reset</button>
+      <button class="btn btn-info" ng-click="$dismiss()" ng-show="buttons.cancel">Cancel</button>
+    </div>
+  </form>
+</div>
+</script>
+
+<h1><a href="/media/_design/media/index.html" id="header">MediaGrid</a></h1>
+
+<div id="chat" ng-controller="mgChat.chatCtrl">
+
+  <tabs selected="chat.selected">
+    <pane title="{{user.room}}" id="room" icon="icon-comments" num-msgs="{{msg_list.length}}">
+      <div class="line" ng-repeat="msg in msg_list">
+        <span class="created_at" ng-hide="msg.value.announcement" ng-bind="msg.value.created_at | date:'H:mm:ss'"></span>
+	<span class="nick label" ng-hide="msg.value.announcement" ng-class="{true:'label-info',false:''}[msg.value.nick==user.username]" 
+	  ng-bind="msg.value.nick + ':'"></span>
+	<span class="message" ng-bind="msg.value | decrypt:users:user.username"></span>
+      </div>
+    </pane>
+    <pane ng-repeat="username in users" title="{{username.name}}" icon="{{{true:'icon-heart',false:'icon-user'}[username.name == user.username]}}" 
+      num-msgs="{{username.messages.length}}">
+      <div class="line" ng-repeat="msg in username.messages">
+        <span class="created_at" ng-hide="msg.announcement" ng-bind="msg.created_at | date:'H:mm:ss'"></span>
+	<span class="nick label" ng-hide="msg.announcement" ng-class="{true:'label-info',false:''}[msg.from==user.username]" 
+	  ng-bind="msg.from + ' > ' + msg.to + ':'"></span>
+	<span class="message" ng-bind="msg | decrypt:users:user.username"></span>
+      </div>
+    </pane>
+  </tabs>
+
+  <div id="userinput" class="input-append">
+    <div class="btn-group dropup" id="options">
+      <button class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-cog"></i></button>
+      <ul class="dropdown-menu pull-right">
+        <li><a id="joinroom" ng-click="switchRoom()" href="javascript:void(0);">Create/join private room</a></li>
+        <!--<li><a id="changename" href="javascript:void(0);">Change username</a></li>-->
+        <li><a id="logout" ng-click="logout()" href="javascript:void(0);">Logout</a></li>
+      </ul>
+    </div>
+    <form ng-submit="submitMsg();chat.msg='';" style="display:inline">
+      <button id="send" class="btn" name="send" type="submit" ng-bind="chat.msg.length && (256 - chat.msg.length) || 'Send'"></button>
+      <div id="stretcher">
+        <input type="text" name="inputbox" id="inputbox" autocomplete="off" ng-focus="user.state.upToDate && !modal"
+	  placeholder="Type message here" maxlength="512" ng-model="chat.msg" 
+	  required ng-maxlength="512" />
+      </div>
+      
+    </form>
+    
+  </div>
+
+</div>
+</div>

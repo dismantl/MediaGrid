@@ -6,23 +6,25 @@ function(newDoc, oldDoc, userCtx) {
   if (newDoc.type === 'USER' || (oldDoc && oldDoc.type === 'USER')) {
     if (oldDoc || newDoc._deleted) {
       if (userCtx.name !== oldDoc._id) {
-	throw({unauthorized: "You can't modify or delete other people's docs, you jerk!"});
+	throw({unauthorized: "You can't modify or delete other people's user docs"});
       }
       if (newDoc._deleted) return;
     }
     required("_id");
     unchanged("_id"); // this might change if allow users to change nicknames
-    if (oldDoc && oldDoc.key) {
-      unchanged("key"); // this is pretty important
-    }
+    
+    // TODO: uncomment this when native clients are ready
+//     if (oldDoc && oldDoc.key) {
+//       unchanged("key"); // this is pretty important
+//     }
     required("rooms");
-    if (!RegExp(/^[a-zA-Z0-9]{1,12}$/).test(newDoc.name)) {
+    if (!RegExp(/^[a-zA-Z0-9]{1,12}$/).test(newDoc._id)) {
       throw({forbidden: "invalid username"});
     }
     if (newDoc.key && (newDoc.key !== 0) && !RegExp(/^[a-zA-Z0-9=_-]{42,43}$/).test(newDoc.key)) {
       throw({forbidden: "invalid public key...sketchball."});
     }
-    if (Object.prototype.toString.call(newDoc.rooms) != '[object Array]' || newDoc.rooms.length === 0) {
+    if (Object.prototype.toString.call(newDoc.rooms) != '[object Array]') {
       throw({forbidden: "invalid rooms array"});
     }
   } else if (newDoc.type === 'MSG' || (oldDoc && oldDoc.type === 'MSG')) {

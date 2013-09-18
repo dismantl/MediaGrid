@@ -2,16 +2,10 @@
 <html lang="en" ng-app="mgFiles">
 <head><title>Media Grid</title>
 <link href="style/bootstrap.min.css" type="text/css" rel="stylesheet" />
+<link href="style/font-awesome.min.css" type="text/css" rel="stylesheet" />
 <link href="style/mediagrid.css" type="text/css" rel="stylesheet" />
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-  <script src="/_utils/script/sha1.js"></script>
-  <script src="/_utils/script/json2.js"></script>
-  <script src="/_utils/script/jquery.js"></script>
-  <script src="/_utils/script/jquery.couch.js"></script>
-  <script src="/_utils/script/jquery.form.js"></script>
-  <script src="lib/angular.js"></script>
-  <script src="script/app.js"></script>
-  <script src="script/services.js"></script>
+<meta name="viewport" content="initial-scale=1.0" />
 </head>
 <body class="tahoe-directory-page" ng-controller="mgFileCtrl">
 
@@ -19,24 +13,27 @@
 
   <div id="path" ng-show="current">
     <ul class="breadcrumb">
-      <li ng-repeat="link in links"><a class="breadcrumb" ng-href="{{document.location.pathname + '?dir=' + link.path}}">{{link.text}}</a> » </li>
-      <li class="active">{{current}}</li>
+      <li ng-show="current"><a class="breadcrumb" href="files.html">Home</a> » </li>
+      <li ng-repeat="link in links"><a class="breadcrumb" ng-href="{{document.location.pathname + '?dir=' + link.path}}" ng-bind="link.text"></a> » </li>
+      <li class="active" ng-bind="current"></li>
     </ul>
   </div>
 
   <div id="content">
     <table class="tahoe-directory">
+      <thead>
       <tr id="headers">
         <th>Type</th>
         <th>Filename</th>
         <th>Size (bytes)</th>
         <th>Time Uploaded</th>
       </tr>
+      </thead>
       <tr ng-repeat="item in items | orderBy:'time'" class="node">
-        <td>{{item.type}}</td>
-        <td><a ng-href="{{item.fileurl}}">{{item.filename}}</a></td>
-        <td>{{item.size}}</td>
-        <td class="time">{{item.time | date:'medium'}}</td>
+        <td class="type"><a ng-href="{{item.fileurl}}">{{item.type == "FILE" && "&#xf15b;" || "&#xf07c;"}}</a></td>
+        <td><a ng-href="{{item.fileurl}}" ng-bind="item.filename"></a></td>
+        <td ng-bind="item.size"></td>
+        <td class="time" ng-bind="item.time | date:'medium'"></td>
       </tr>
     </table>
   </div>
@@ -69,15 +66,14 @@
       </div>
     </div>
 
-    <div class="well" id="logos">
-      <h3>Powered by:</h3>
-      <a href="https://couchdb.org/" target="_blank"><img src="style/images/couchdb.png" /></a>
-      <a href="http://www.olsr.org/" target="_blank"><img src="style/images/olsr_small.jpg" /></a>
-      <a href="http://www.debian.org/" target="_blank"><img src="style/images/debian_small.png" /></a>
-      <a href="http://www.raspberrypi.org/" target="_blank"><img src="style/images/raspberry_pi_small.png" /></a>
-    </div>
-
   </div>
-
+  <script src="/_utils/script/sha1.js"></script>
+  <script src="/_utils/script/json2.js"></script>
+  <script src="/_utils/script/jquery.js"></script>
+  <script src="/_utils/script/jquery.couch.js"></script>
+  <script src="/_utils/script/jquery.form.js"></script>
+  <script src="lib/angular.js"></script>
+  <script src="script/app.js"></script>
+  <script src="script/services.js"></script>
 </body>
 </html>

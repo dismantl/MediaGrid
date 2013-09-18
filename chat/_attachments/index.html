@@ -1,102 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" ng-app="mgChat">
 <head><title>Media Grid</title>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+<meta name="viewport" content="initial-scale=1.0" />
 <link href="style/bootstrap.min.css" type="text/css" rel="stylesheet" />
+<link href="style/bootstrap-responsive.min.css" type="text/css" rel="stylesheet" />
 <link href="style/mediagrid.css" type="text/css" rel="stylesheet" />
 <link href="style/font-awesome.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+<div ng-view></div>
+
   <script src="/_utils/script/sha1.js"></script>
   <script src="/_utils/script/json2.js"></script>
-  <!--<script src="/_utils/script/jquery.js"></script>-->
   <script src="script/jquery-1.7.2.min.js"></script>  <!-- needed later version of jQuery than version shipped with CouchDB -->
-  <!--<script src="/_utils/script/jquery.couch.js"></script>-->
   <script src="script/jquery.couch.js"></script>  <!-- made a couple customizations to jquery.couch.js -->
   <script src="/_utils/script/jquery.form.js"></script>
-  <script src="script/jquery.mustache.js"></script>
   <script src="script/build.js"></script>
-  <script src="script/bootstrap.min.js"></script>
-  <script src="script/bootstrapx-clickover.js"></script>
-</head>
-<body id="mediagrid-chat">
-
-<h1><a href="/media/_design/media/index.html" id="header">MediaGrid</a></h1>
-
-<div id="chat">
-
-<div id="fullscreen">
-  <div id="popup">
-    <div id="popupmsg"></div>
-    <input type="text" id="name" name="name" autocomplete="off" value="Enter nickname">
-    <div>
-      <button id="okay" type="button">Okay</button>
-      <button id="cancel" type="button">Cancel</button>
-    </div>
-  </div>
-</div>
-
-
-<div class="tabbable tabs-right">
-  <ul class="nav nav-tabs" id="sidebar"></ul>
-  <div class="tab-content" id="content-container">
-    <div class="tab-pane active" id="room-content">
-      <div class="messages"></div>
-    </div>
-    <!--<div id="user-panes"></div>-->
-  </div>
-</div>
-
-<div id="userinput" class="input-append">
-<input type="text" name="inputbox" id="inputbox" autocomplete="off" maxlength="512">
-<button id="send" class="btn" name="send" type="button">Send</button>
-<div class="btn-group dropup" id="options">
-  <button class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-cog"></i></button>
-  <ul class="dropdown-menu">
-    <li><a id="joinroom" href="javascript:void(0);">Create/join private room</a></li>
-    <!--<li><a id="changename" href="javascript:void(0);">Change username</a></li>-->
-    <li><a id="logout" href="javascript:void(0);">Logout</a></li>
-  </ul>
-</div>
-</div>
-</div>
-
-<script type="text/javascript" src="script/jquery-ui-1.8.21.custom.min.js"></script>
-<script type="text/javascript" src="script/chat.js"></script>
-
-<!--<div id="window">
-  <div id="info"></div>
-  <div id="infobar"><i id="infobar-icon" class="icon-caret-up"></i></div>
-  <div id="messages" class="full"></div>
-</div>
-
-<div id="sidebar">
-  <div id="room"></div>
-  <div id="users"></div>
-</div>-->
-
-<script id="window" type="text/x-mustache" charset="utf-8">
-  <div class="tab-pane {{active}}" id="{{window_name}}-content">
-    <!--<div class="info"></div>
-    <div class="btn infobar"><i class="infobar-icon icon-caret-up"></i></div>-->
-    <div class="messages"></div>
-  </div>
-</script>
-
-<!--<p class="user {{class}}" id="{{id}}"><i class="icon-user"></i> {{nick}}</p>-->
-
-<script id="tabs" type="text/x-mustache" charset="utf-8">
-  {{#tabs}}
-    <li class="{{class}}" id="{{identifier}}"><a href="#{{identifier}}-content" data-toggle="tab"><i class="{{icon}}"></i> {{label}}{{#info}}<span> <i class="icon-info-sign"></i></span>{{/info}}</a></li>
-  {{/tabs}}
-</script>
-
-<script id="message" type="text/x-mustache" charset="utf-8">
-      {{#items}}
-      <div class='line'>
-	<span class="created_at"> {{created_at}}</span>
-	{{{nick}}}
-	<span class='message'>{{message}}</span>
-      </div>
-      {{/items}}
-</script>
-
+  <script src="lib/angular.js"></script>
+  <script src="lib/ui-bootstrap-tpls-0.6.0.min.js"></script>
+  <script src="script/utils.js"></script>
+  <script src="script/app.js"></script>
+  <script src="script/controllers.js"></script>
+  <script src="script/directives.js"></script>
+  <script src="script/filters.js"></script>
+  <script src="script/services.js"></script>
 </body></html>

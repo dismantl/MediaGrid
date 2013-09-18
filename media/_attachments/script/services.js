@@ -75,5 +75,3 @@ function getParameterByName(name) {
 		    .exec(window.location.search);
     return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
 }
-
-// this for example of watching for a change (setupChanges): http://docs.angularjs.org/guide/directive (timer example)
