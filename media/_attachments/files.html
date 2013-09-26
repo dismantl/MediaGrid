@@ -29,7 +29,7 @@
         <th>Time Uploaded</th>
       </tr>
       </thead>
-      <tr ng-repeat="item in items | orderBy:'time'" class="node">
+      <tr ng-repeat="item in items | orderBy:'time':true" class="node">
         <td class="type"><a ng-href="{{item.fileurl}}">{{item.type == "FILE" && "&#xf15b;" || "&#xf07c;"}}</a></td>
         <td><a ng-href="{{item.fileurl}}" ng-bind="item.filename"></a></td>
         <td ng-bind="item.size"></td>
