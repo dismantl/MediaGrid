@@ -34,7 +34,7 @@ Hardware Requirements
 Installation
 ------------
 
-This section describes the procedure for installing MediaGrid as a stand-alone web application. MediaGrid requires CouchDB version 1.2.x or later, which is in the standard repositories for Debian Wheezy and Ubuntu 12.10 or above.
+This section describes the procedure for installing MediaGrid as a stand-alone web application. MediaGrid requires CouchDB version 1.2.x or later, which is in the standard repositories for Debian Wheezy and Ubuntu 12.10 or above. If you have an older Linux OS, you can instead use [Build CouchDB](https://github.com/iriscouch/build-couchdb) to build the latest version of CouchDB.
 
     apt-get update && sudo apt-get install couchdb python python-pip git -y
     pip install couchapp
