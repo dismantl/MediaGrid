@@ -44,7 +44,7 @@ Now get the MediaGrid files:
     cd ~/
     git clone git://github.com/danstaples/MediaGrid.git
 
-Modify the `bind_address` and `timeout` options and add an admin user in the CouchDB configuration file `/etc/couchdb/local.ini`:
+Modify the `bind_address` and `timeout` options in the CouchDB configuration file `/etc/couchdb/default.ini`:
 
     [httpd]
     bind_address = 0.0.0.0
@@ -52,6 +52,8 @@ Modify the `bind_address` and `timeout` options and add an admin user in the Cou
     [couch_httpd_auth]
     timeout = 86400
     
+Finally, add an admin user in `/etc/couchdb/local.ini`:
+
     [admins]
     adminuser = s3cr3tp4ssw0rd
 
