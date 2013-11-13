@@ -1,7 +1,7 @@
 MediaGrid
 =========
 
-MediaGrid is a **takedown-resistant, distributed wireless infrastructure** allowing citizens to **communicate and share real-time photo and video documentation** at public demonstrations, without the need for internet access. A MediaGrid uses a replicated database running on a wireless mesh network of small, battery-powered devices. Smartphones (or any wifi-enabled device) within range can then connect to the wifi network to upload files and securely chat. **ALL files uploaded to the grid are completely recoverable even if most of the devices are confiscated or taken offline**. See the original (outdated) [design document](https://github.com/danstaples/MediaGrid/blob/master/MediaGrid.Design.pdf?raw=true) for more details.
+MediaGrid is a **takedown-resistant, distributed wireless infrastructure** allowing citizens to **communicate and share real-time photo and video documentation** at public demonstrations, without the need for internet access. A MediaGrid uses a replicated database running on a wireless mesh network of small, battery-powered devices. Smartphones (or any wifi-enabled device) within range can then connect to the wifi network to upload files and securely chat. **ALL files uploaded to the grid are completely recoverable even if most of the devices are confiscated or taken offline**. See the original (outdated) [design document](https://github.com/dismantl/MediaGrid/blob/master/MediaGrid.Design.pdf?raw=true) for more details.
 
 MediaGrid can either be run as a simple web application on any linux server or as part of a fully automated and independent system using a [Raspberry Pi](http://www.raspberrypi.org/).
 
@@ -42,7 +42,7 @@ This section describes the procedure for installing MediaGrid as a stand-alone w
 Now get the MediaGrid files:
 
     cd ~/
-    git clone git://github.com/danstaples/MediaGrid.git
+    git clone git://github.com/dismantl/MediaGrid.git
 
 Modify the `bind_address` and `timeout` options in the CouchDB configuration file `/etc/couchdb/default.ini`:
 
@@ -76,7 +76,7 @@ More info
 
 For questions or comments, send me an e-mail to dan@disman.tl.
 
-All donations to the project are appreciated, and will go towards purchasing hardware for testing and development. You can contribute via [Gittip](https://www.gittip.com/danstaples/) or [Flattr](https://flattr.com/profile/danstaples).
+All donations to the project are appreciated, and will go towards purchasing hardware for testing and development. You can contribute via [Gittip](https://www.gittip.com/dismantl/) or [Flattr](https://flattr.com/profile/danstaples).
 
 
 Changelog/Updates
