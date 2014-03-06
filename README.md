@@ -36,8 +36,8 @@ Installation
 
 This section describes the procedure for installing MediaGrid as a stand-alone web application. MediaGrid requires CouchDB version 1.2.x or later, which is in the standard repositories for Debian Wheezy and Ubuntu 12.10 or above. If you have an older Linux OS, you can instead use [Build CouchDB](https://github.com/iriscouch/build-couchdb) to build the latest version of CouchDB.
 
-    apt-get update && sudo apt-get install couchdb python python-pip python-dev git -y
-    pip install couchapp
+    sudo apt-get update && sudo apt-get install couchdb python python-pip python-dev git -y
+    sudo pip install couchapp
 
 Now get the MediaGrid files:
 
@@ -61,12 +61,13 @@ replacing the above credentials with your own.  **Important: use unique, random 
     
 Now Restart the CouchDB server:
 
-`service couchdb restart`
+`sudo service couchdb restart`
 
 Insert MediaGrid into the CouchDB server:
 
     couchapp push ~/MediaGrid/media http://adminuser:s3cr3tp4ssw0rd@localhost:5984/media
     couchapp push ~/MediaGrid/chat http://adminuser:s3cr3tp4ssw0rd@localhost:5984/chat
+replacing 'adminuser:s3cr3tp4ssw0rd' with your own credentials. 
 
 Finally, open up `http://localhost:5984/media/_design/media/index.html` in your web browser to get started. Have fun!
 
