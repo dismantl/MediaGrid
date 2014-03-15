@@ -109,6 +109,7 @@ function usernameModalCtrl($scope,$modalInstance,register,user) {
   $scope.placeholder = "Username here";
   $scope.requiredMsg = "Please choose a username";
   $scope.buttons = {ok:true,reset:true};
+  $scope.form = true;
   $scope.onOk = function() {
     user.username = $scope.input.txt;
     register(user).then(function(retUser) {
@@ -131,6 +132,7 @@ usernameModalCtrl.$inject = ['$scope','$modalInstance','register','user'];
 function keyModalCtrl($scope,$modalInstance,user,$timeout) {
   $scope.header = "Generating keys...";
   $scope.input = {txt:''};
+  $scope.form = true;
   $scope.msg = "Type on your keyboard as randomly as possible for a few seconds:";
   $scope.buttons = {noButtons:true};
   $timeout(function(){
@@ -275,6 +277,20 @@ mgChatControllers.controller('mgChat.chatCtrl',
       $scope.modal = null;
     });
   };
+  
+  $scope.userInfo = function() {
+    $scope.modal = $modal.open({
+      templateUrl: "popupTemplate",
+      controller: userInfoCtrl,
+      backdrop: true,
+      keyboard: true,
+      resolve: {
+	user: function() {
+	  return $scope.users[$scope.chat.selected];
+	}
+      }
+    });
+  };
 }]);
 
 function roomModalCtrl($scope,$modalInstance,user) {
@@ -282,8 +298,14 @@ function roomModalCtrl($scope,$modalInstance,user) {
   $scope.input = {txt:user.room,maxlength:20};
   $scope.requiredMsg = "Please enter a room name";
   $scope.buttons = {ok:true,cancel:true};
+  $scope.form = true;
   $scope.onOk = function() {
     window.location = window.location.pathname + "?room=" + $scope.input.txt;
   };
 }
 roomModalCtrl.$inject = ['$scope','$modalInstance','user'];
+
+function userInfoCtrl($scope,$modalInstance,user) {
+  $scope.header = "User information";
+  $scope.msg = "information for " + user.name + " blah blah blah";
+}

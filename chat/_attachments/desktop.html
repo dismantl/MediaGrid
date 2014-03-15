@@ -4,7 +4,7 @@
 <div class="modal-header" ng-hide="noHeader"><h3 ng-bind="header"></h3></div>
 <div class="modal-body">
   <div id="popupMsg" ng-bind="msg" ng-show="msg"></div>
-  <form name="popupForm" ng-submit="onOk()">
+  <form name="popupForm" ng-show="form" ng-submit="onOk()">
     <div class="control-group" ng-class="{error: popupForm.$invalid}">
       <input type="text" ng-hide="noInput" ng-model="input.txt" placeholder="{{placeholder}}"
          name="popupInput" autocomplete="off" id="popupInput" ng-focus="!noInput"
@@ -27,7 +27,7 @@
 <div id="chat" ng-controller="mgChat.chatCtrl">
 
   <tabs selected="chat.selected">
-    <pane title="{{user.room}}" id="room" icon="icon-comments" num-msgs="{{msg_list.length}}">
+    <pane title="{{user.room}}" id="room" icon="fa fa-comments" num-msgs="{{msg_list.length}}">
       <div class="line" ng-repeat="msg in msg_list">
         <span class="created_at" ng-hide="msg.value.announcement" ng-bind="msg.value.created_at | date:'H:mm:ss'"></span>
 	<span class="nick label" ng-hide="msg.value.announcement" ng-class="{true:'label-info',false:''}[msg.value.nick==user.username]" 
@@ -35,7 +35,7 @@
 	<span class="message" ng-bind="msg.value | decrypt:users:user.username"></span>
       </div>
     </pane>
-    <pane ng-repeat="username in users" title="{{username.name}}" icon="{{{true:'icon-heart',false:'icon-user'}[username.name == user.username]}}" 
+    <pane ng-repeat="username in users" title="{{username.name}}" icon="{{{true:'fa fa-heart',false:'fa fa-user'}[username.name == user.username]}}" 
       num-msgs="{{username.messages.length}}">
       <div class="line" ng-repeat="msg in username.messages">
         <span class="created_at" ng-hide="msg.announcement" ng-bind="msg.created_at | date:'H:mm:ss'"></span>
@@ -48,8 +48,9 @@
 
   <div id="userinput" class="input-append">
     <div class="btn-group dropup" id="options">
-      <button class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-cog"></i></button>
+      <button class="btn dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bars"></i></button>
       <ul class="dropdown-menu pull-right">
+	<li><a id="user-info-btn" ng-hide="chat.selected == user.room" ng-click="userInfo()" href="javascript:void(0);">User information</a></li>
         <li><a id="joinroom" ng-click="switchRoom()" href="javascript:void(0);">Create/join private room</a></li>
         <!--<li><a id="changename" href="javascript:void(0);">Change username</a></li>-->
         <li><a id="logout" ng-click="logout()" href="javascript:void(0);">Logout</a></li>

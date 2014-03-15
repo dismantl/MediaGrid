@@ -327,6 +327,10 @@ border-left:0;
   border-radius:0;
 }
 
+.nav-tabs .fa {
+  padding:0 4px;
+}
+
 #stretcher {
   overflow:hidden;
 }
@@ -398,9 +402,9 @@ background-color:#d0d0d0;
   width:40px;
 }
 
-#options i {
+/*#options i {
   font-size:20px;
-}
+}*/
 
 button::-moz-focus-inner {
   border: 0;
