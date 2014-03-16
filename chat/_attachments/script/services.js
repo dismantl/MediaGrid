@@ -284,7 +284,11 @@ mgChatCouchdbServices.factory(
 	    user_doc.left.push(room);
 	    db.saveDoc(user_doc, {
 	      success: function() {
-		typeof callback == "function" && callback();
+		$.couch.logout({
+		  success: function() {
+		    typeof callback == "function" && callback();
+		  }
+		});
 	      }
 	    });
 	  }

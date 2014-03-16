@@ -256,7 +256,9 @@ mgChatControllers.controller('mgChat.chatCtrl',
   };
   
   $scope.logout = function() {
-    window.location='/media/_design/media/index.html';
+    logout($scope.user,$scope.users,$scope.user.room,function() {
+      window.location='/media/_design/media/index.html';
+    });
   };
   
   $scope.switchRoom = function() {
