@@ -103,15 +103,48 @@ mgChatControllers.controller('mgChat.userCtrl',
   });
 }]);
 
-function usernameModalCtrl($scope,$modalInstance,register,user) {
+function usernameModalCtrl($scope,$modalInstance,register,login,user) {
   $scope.header = "Pick a username";
   $scope.input = {txt:user.username,maxlength:12};
   $scope.placeholder = "Username here";
   $scope.requiredMsg = "Please choose a username";
   $scope.buttons = {ok:true,reset:true};
+  $scope.storedUsers = [];
+  //retrive users from localStorage
+  if(window.localStorage){
+	  if(localStorage.credentials){
+		$scope.storedUsers=JSON.parse(localStorage.credentials);
+	  }
+  }
+  $scope.onLogin = function(username,password){
+	$scope.input.txt = "";
+	user.username=username;
+	user.password=password;
+	login(user).then(function(retUser){
+		user = retUser;
+		$modalInstance.close(user);
+	},function(err) {
+      if (err.user.username == '') {
+	$scope.reset();
+	$scope.placeholder = "Login failed, try again";
+      } else
+	alert(err.msg);
+    });
+  };
   $scope.onOk = function() {
+    var password = gen(10,true,false);//T random generated password.
+    user.password = password;
     user.username = $scope.input.txt;
     register(user).then(function(retUser) {
+      //store user credential into localStorage
+      if(window.localStorage){
+		  if(!localStorage.credentials){
+			localStorage.credentials="[]";
+		  }
+		  var credentials=JSON.parse(localStorage.credentials);
+		  credentials.push({username:user.username,password:user.password})
+	      localStorage.credentials=JSON.stringify(credentials);
+	  }
       user = retUser;
       $modalInstance.close(user);
     },function(err) {
@@ -126,7 +159,7 @@ function usernameModalCtrl($scope,$modalInstance,register,user) {
     $scope.input.txt = "";
   }
 }
-usernameModalCtrl.$inject = ['$scope','$modalInstance','register','user'];
+usernameModalCtrl.$inject = ['$scope','$modalInstance','register','login','user'];
 
 function keyModalCtrl($scope,$modalInstance,user,$timeout) {
   $scope.header = "Generating keys...";

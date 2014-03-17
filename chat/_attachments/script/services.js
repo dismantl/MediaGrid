@@ -41,6 +41,33 @@ mgChatCouchdbServices.value(
   }]);
   
 mgChatCouchdbServices.factory(
+  'login',['$rootScope','$q', function($rootScope,$q) {
+    return function(user) {
+      console.log('login');
+      var deferred = $q.defer();
+      $.couch.login({
+	      name: user.username,
+	      password: user.password,
+	      success: function() {
+		console.log('logged in');
+		user.state.registered = true;
+		$rootScope.$apply(function(){
+		  deferred.resolve(user);
+		});
+	      },
+              error: function() {
+		console.log('failed to log in');
+                $rootScope.$apply(function(){
+		  deferred.reject({user:user,msg:'Error logging in, try again'});
+		});
+              }
+	    });
+      return deferred.promise;
+    };
+  }]);
+
+
+mgChatCouchdbServices.factory(
   'register',['$rootScope','$q', function($rootScope,$q) {
     return function(user) {
       console.log('register');

@@ -13,6 +13,7 @@
       <span ng-show="popupForm.popupInput.$error.pattern" class="help-inline">Alphanumeric characters only</span>
       <!--<span ng-show="popupForm.popupInput.$error.maxlength" class="help-inline">{{input.maxlength}} characters max</span>-->
     </div>
+	<button class="btn btn-info" ng-repeat="auser in storedUsers" ng-click="onLogin(auser.username,auser.password)">{{auser.username}}</button>
     <div class="modal-footer" ng-hide="buttons.noButtons">
       <button class="btn btn-primary" type="submit" ng-show="buttons.ok" ng-disabled="popupForm.$invalid">Okay</button>
       <button class="btn btn-info" ng-click="reset()" ng-show="buttons.reset">Reset</button>
