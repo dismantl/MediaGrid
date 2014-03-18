@@ -48,8 +48,9 @@ angular.module('couchdbServices', [])
       console.log(form);
       console.log(_attachments);
       console.log(_rev);
-      var doc = { type: 'FILE' };
+      
       if (path.dir) form.dir = path.dir;
+      var doc = { type: 'FILE', dir: form.dir} ;
       var deferred = $q.defer();
       $.ajax({
 	url: '//' + document.location.host + '/' + path.pathArray[1] + '/_design/' + path.design + '/_update/file',
