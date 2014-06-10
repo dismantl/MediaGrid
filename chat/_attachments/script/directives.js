@@ -1,7 +1,12 @@
 'use strict';
 
 /* Directives */
-
+/*
+ngFocus automatically puts the focus on input fields (or any DOM
+elements with the 'ng-focus' attribute in desktop.html), so that the
+user doesn't have to manually click on the input fields before typing
+into them.
+*/
 angular.module('ng').directive('ngFocus', function($timeout) {
   return {
     link: function ( scope, element, attrs ) {
@@ -19,7 +24,11 @@ angular.module('ng').directive('ngFocus', function($timeout) {
 });
 
 var mgChatDirectives = angular.module('mgChat.directives', []);
-
+/*
+The tabs directive creates a tab for
+the chat room and one for each user, and changes the CSS depending on
+which one is selected. 
+*/
 mgChatDirectives.directive('tabs', ['$timeout','$window',function($timeout,$window) {
   return {
     restrict: 'E',
@@ -83,7 +92,11 @@ mgChatDirectives.directive('tabs', ['$timeout','$window',function($timeout,$wind
     replace: true
   };
 }]);
-
+/*
+The panes directive then creates each chat pane,
+and shows the one whose tab is currently selected (and makes a tab blink
+when there are unread messages in that pane)
+*/
 mgChatDirectives.directive('pane', ['$rootScope',function($rootScope) {
   return {
     require: '^tabs',
@@ -117,6 +130,10 @@ mgChatDirectives.directive('pane', ['$rootScope',function($rootScope) {
 }]);
 
 // From https://github.com/james-huston/angular-directive-autoscroll
+/*
+autoscrollDown makes sure the current chat pane, when it is full,
+scrolls down automatically whenever a new message is received.
+*/
 mgChatDirectives.directive('autoscrollDown', function () {
   return {
     link: function postLink(scope, element, attrs) {
