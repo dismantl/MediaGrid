@@ -13,6 +13,7 @@ mgChatCouchdbServices.value(
     dir: getParameterByName("dir")
   })
   .factory('db',['path',function(path) { return $.couch.db(path.pathArray[1]); }])
+  //get user session from couchdb, usually after login
   .factory(
     'getSession',['$rootScope','$q', function($rootScope,$q) {
     return function(user) {
@@ -39,7 +40,7 @@ mgChatCouchdbServices.value(
       return deferred.promise;
     };
   }]);
-  
+//login to couchdb with username and password
 mgChatCouchdbServices.factory(
   'login',['$rootScope','$q', function($rootScope,$q) {
     return function(user) {
@@ -66,7 +67,7 @@ mgChatCouchdbServices.factory(
     };
   }]);
 
-
+//register a new user, and log in with that user if success.
 mgChatCouchdbServices.factory(
   'register',['$rootScope','$q', function($rootScope,$q) {
     return function(user) {
@@ -114,7 +115,7 @@ mgChatCouchdbServices.factory(
       return deferred.promise;
     };
   }]);
-
+//get a user's document by username
 mgChatCouchdbServices.factory(
   'getUserDoc',['$rootScope','db','$q',function($rootScope,db,$q) {
     return function(user,async) {
@@ -140,7 +141,7 @@ mgChatCouchdbServices.factory(
       return deferred.promise;
     };
   }]);
-
+// retrieve a user's document and update it with a new one. if failed, then create a new one.
 mgChatCouchdbServices.factory(
   'updateUserDoc',['$rootScope','db','getUserDoc','$q',function($rootScope,db,getUserDoc,$q) {
     return function(user) {
@@ -185,6 +186,7 @@ mgChatCouchdbServices.factory(
   }]);
 
 mgChatCouchdbServices.value('msgQueue',[]);
+//get message of the day.
 mgChatCouchdbServices.factory(
   'getMOTD',['$rootScope','db','$q',function($rootScope,db,$q) {
     return function() {
@@ -199,7 +201,7 @@ mgChatCouchdbServices.factory(
       return deferred.promise;
     };
   }]);
-
+//get message list for username in room, from firstMsg to lastMsg
 mgChatCouchdbServices.factory(
   'getMsgs',['$rootScope','db','path','$q',function($rootScope,db,path,$q) {
     // TODO: pass list of blocked users to server, so don't receive msgs from blocked users
@@ -222,7 +224,7 @@ mgChatCouchdbServices.factory(
       return deferred.promise;
     };
   }]);
-
+//queue messages to send.
 mgChatCouchdbServices.factory(
   'queueMsg',['msgQueue','postQueue',function(msgQueue,postQueue) {
     return function(plaintext,recipients,username,room,priority) {
@@ -264,7 +266,7 @@ mgChatCouchdbServices.factory(
       }
     };
   }]);
-
+//post message to couchdb server.
 mgChatCouchdbServices.factory(
   'postMsg',['path','$q','$rootScope',function(path,$q,$rootScope) {
     return function(msg,async) {
@@ -286,6 +288,7 @@ mgChatCouchdbServices.factory(
     };
   }]);
 
+//post first message of message queue
 mgChatCouchdbServices.factory(
   'postQueue',['msgQueue','postMsg',function(msgQueue,postMsg) {
     return {
@@ -300,7 +303,7 @@ mgChatCouchdbServices.factory(
       }
     };
   }]);
-
+//logout from couchdb
 mgChatCouchdbServices.factory(
   'logout',['db','getUserDoc',function(db,getUserDoc) {
     return function(user,recipients,room, callback) {
