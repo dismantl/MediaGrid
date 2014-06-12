@@ -20,7 +20,7 @@ mgChatControllers.controller('mgChat.userCtrl',
              upToDate: false
     }
   };
-  //set watch for session state, if unrigsted, then show dialog to get username, and register user
+  //set watch for session state, if unregistered, then show dialog to get username, and register user
   $scope.$watch('user.state.hasSession',function(newVal,oldVal) {
     if (newVal !== oldVal) {
       console.log('user.state.hasSession == true');
@@ -164,7 +164,7 @@ function usernameModalCtrl($scope,$modalInstance,register,login,user) {
 }
 usernameModalCtrl.$inject = ['$scope','$modalInstance','register','login','user'];
 
-//key generating dialog, type to get a random password. 
+//dialog to generate entropy for crypto key generation
 function keyModalCtrl($scope,$modalInstance,user,$timeout) {
   $scope.header = "Generating keys...";
   $scope.input = {txt:''};
@@ -257,7 +257,7 @@ mgChatControllers.controller('mgChat.chatCtrl',
     if (!initialized.users) initialized.users = true;
     $scope.$apply();    
   }
-  //append new message list
+  //get list of chat room messages
   function getMessages(latest) {
     var firstMsg = latest.results[0].id;
     var lastMsg = latest.results[latest.results.length - 1].id;
@@ -265,7 +265,7 @@ mgChatControllers.controller('mgChat.chatCtrl',
       $scope.msg_list = $scope.msg_list.concat(resp.rows);
     });
   }
-  //append new message list to correpond users
+  //get instant messages list from each user
   function getInstMessages(latest) {
     angular.forEach(latest.results,function(val,key) {
       $scope.users[val.doc.from == $scope.user.username ? val.doc.to : val.doc.from].messages.push(val.doc);
