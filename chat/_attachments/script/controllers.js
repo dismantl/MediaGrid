@@ -4,6 +4,7 @@
 
 var mgChatControllers = angular.module('mgChat.controllers',['mgChat.couchdbServices'])
 
+//initialize user control 
 mgChatControllers.controller('mgChat.userCtrl', 
 			     ['$scope','getSession','updateUserDoc','$modal',
 			     function($scope,getSession,updateUserDoc,$modal) {
@@ -19,7 +20,7 @@ mgChatControllers.controller('mgChat.userCtrl',
              upToDate: false
     }
   };
-  
+  //set watch for session state, if unregistered, then show dialog to get username, and register user
   $scope.$watch('user.state.hasSession',function(newVal,oldVal) {
     if (newVal !== oldVal) {
       console.log('user.state.hasSession == true');
@@ -39,7 +40,7 @@ mgChatControllers.controller('mgChat.userCtrl',
       }
     }
   });
-  
+  //set watch for registered, and show key dialog to generate keys for user, and update to couchdb.
   $scope.$watch('user.state.registered',function(newVal,oldVal) {
     if (newVal !== oldVal) {
       console.log('user.state.registered == true');
@@ -94,7 +95,7 @@ mgChatControllers.controller('mgChat.userCtrl',
       alert(err);
     });
   }
-  
+  // entry point, getsession from couchdb.
   // entry point
   getSession($scope.user).then(function(user) {
     $scope.user = user;
@@ -103,6 +104,8 @@ mgChatControllers.controller('mgChat.userCtrl',
   });
 }]);
 
+
+//user name dialog controller. Enter a new username to get registered, or choose an existing username to login.
 function usernameModalCtrl($scope,$modalInstance,register,login,user) {
   $scope.header = "Pick a username";
   $scope.input = {txt:user.username,maxlength:12};
@@ -162,6 +165,7 @@ function usernameModalCtrl($scope,$modalInstance,register,login,user) {
 }
 usernameModalCtrl.$inject = ['$scope','$modalInstance','register','login','user'];
 
+//dialog to generate entropy for crypto key generation
 function keyModalCtrl($scope,$modalInstance,user,$timeout) {
   $scope.header = "Generating keys...";
   $scope.input = {txt:''};
@@ -205,7 +209,7 @@ mgChatControllers.controller('mgChat.chatCtrl',
   $scope.msg_list = [];
   $scope.chat = {msg:'',selected:$scope.user.room};
   var initialized = {};
-    
+  //set watch for upToDate, to update for user list ,chat message
   $scope.$watch('user.state.upToDate',function(newVal,oldVal) {
     if (newVal !== oldVal) {
       console.log('starting');
@@ -214,11 +218,12 @@ mgChatControllers.controller('mgChat.chatCtrl',
       db.changes(0, {filter: 'chat/im', include_docs: true}, true).onChange(getInstMessages);
     }
   });
-  
+  //get MOTD, get message of the day
+  // a message that you automatically receive whenever you join the room
   getMOTD().then(function(motd){
     $scope.motd = motd;
   });
-  
+  //update users
   function updateUsers(latest) {
     angular.forEach(latest.results,function(user,_) {
       var name = user.doc._id;
@@ -254,7 +259,7 @@ mgChatControllers.controller('mgChat.chatCtrl',
     if (!initialized.users) initialized.users = true;
     $scope.$apply();    
   }
-  
+  //get list of chat room messages
   function getMessages(latest) {
     var firstMsg = latest.results[0].id;
     var lastMsg = latest.results[latest.results.length - 1].id;
@@ -262,14 +267,15 @@ mgChatControllers.controller('mgChat.chatCtrl',
       $scope.msg_list = $scope.msg_list.concat(resp.rows);
     });
   }
-  
+  //get instant messages list from each user
   function getInstMessages(latest) {
     angular.forEach(latest.results,function(val,key) {
       $scope.users[val.doc.from == $scope.user.username ? val.doc.to : val.doc.from].messages.push(val.doc);
     });
     $scope.$apply();
   }
-  
+  //adds the outgoing message to a queue, which is
+  //eventually posted to the couchDB server.
   $scope.submitMsg = function() {
     if ($scope.chat.selected !== $scope.user.room) {  // IM
       var recipients = {};
@@ -293,7 +299,7 @@ mgChatControllers.controller('mgChat.chatCtrl',
       window.location='/media/_design/media/index.html';
     });
   };
-  
+  //switch room and redirect to it
   $scope.switchRoom = function() {
     $scope.modal = $modal.open({
       templateUrl: "popupTemplate",
@@ -327,7 +333,7 @@ mgChatControllers.controller('mgChat.chatCtrl',
     });
   };
 }]);
-
+//room switch controller
 function roomModalCtrl($scope,$modalInstance,user) {
   $scope.header = "Enter room name to join";
   $scope.input = {txt:user.room,maxlength:20};
