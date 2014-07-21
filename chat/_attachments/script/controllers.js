@@ -235,14 +235,15 @@ mgChatControllers.controller('mgChat.chatCtrl',
         if (!$scope.users[name]) {
           $scope.users[name] = {
 	    key: user.doc.key,
-	    seckey: Whirlpool(ecDH($scope.user.prikey, str2bigInt(user.doc.key, 64))),
+// 	    seckey: Whirlpool(ecDH($scope.user.prikey, str2bigInt(user.doc.key, 64))),
+	    seckey: '',
 	    messages: [],
 	    name: name
           };
 	  if (initialized.users || name == $scope.user.username)
 	    $scope.msg_list.push({value: {announcement:true, message: "* " + name + " has arrived"}});
         }
-        var big = str2bigInt($scope.users[name].key, 64);
+        /*var big = str2bigInt($scope.users[name].key, 64);
         if ((equals(big, p25519) || greater(big, p25519) || greater(z, big)) || 
           ($scope.users[name].key !== user.doc.key)) {
 	  // TODO handle this better
@@ -252,7 +253,8 @@ mgChatControllers.controller('mgChat.chatCtrl',
 	} else {
 	  $scope.users[name].fingerprint = Whirlpool(name + $scope.users[name].key).substring(0, 22);
 	  $scope.users[name].fingerprint = bubbleBabble(Crypto.util.hexToBytes($scope.users[name].fingerprint));
-        }
+        }*/
+	$scope.users[name].fingerprint = '';
       }
     });
     

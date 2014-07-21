@@ -17,7 +17,8 @@ mgChatFilters.filter('decrypt', ['msg_map',function(msg_map) {
 	return '';
       } else {
 	var cipher_text = msg.message[username].msg;
-	plaintext = msgDecrypt(msg.from ? msg.from : msg.nick, msg.message);
+// 	plaintext = msgDecrypt(msg.from ? msg.from : msg.nick, msg.message);
+	plaintext = msg.message[username].msg;
 	if (plaintext) msg_map[cipher_text] = plaintext;
       }
     }

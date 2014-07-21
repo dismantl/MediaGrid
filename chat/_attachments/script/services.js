@@ -233,13 +233,15 @@ mgChatCouchdbServices.factory(
 	  if (!room && name != username)
 	    to = name;
 	  if (!user.blocksend) {
-	    var crypt = Crypto.AES.encrypt(plaintext,
+	    /*var crypt = Crypto.AES.encrypt(plaintext,
 	      Crypto.util.hexToBytes(user.seckey.substring(0, 64)), {
 		mode: new Crypto.mode.CBC(Crypto.pad.iso10126)
-	      });
+	      });*/
 	    msg[name] = {
-	      msg: crypt,
-	      hmac: Crypto.HMAC(Whirlpool, crypt, user.seckey.substring(64, 128))
+// 	      msg: crypt,
+// 	      hmac: Crypto.HMAC(Whirlpool, crypt, user.seckey.substring(64, 128))
+	      msg: plaintext,
+	      hmac: ''
 	    };
 	  }
 	});
